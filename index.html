@@ -93,6 +93,7 @@
     .del, .skip { height:28px; border-radius:9px; background:#fff; font-size:11px; font-weight:800; padding:0 8px; }
     .del { color:var(--bad); width:28px; padding:0; font-size:16px; }
     .skip { color:var(--navy); }
+    .edit { color:var(--navy); }
     .nowbar { grid-column:1 / -1; display:flex; align-items:center; gap:8px; color:#c43c3c; font-size:11px; font-weight:800; margin:2px 0 8px; }
     .nowbar i { flex:1; height:2px; background:#f3c4c4; display:block; }
     .sheet { position:fixed; inset:0; background:rgba(8,16,32,.45); display:none; align-items:flex-end; justify-content:center; z-index:20; }
@@ -190,7 +191,7 @@
   <div class="sheet" id="sheet">
     <form class="panel" id="form" action="javascript:void(0)">
       <div class="grab"></div>
-      <h2>Impegno di lavoro</h2>
+      <h2 id="formTitle">Impegno di lavoro</h2>
       <label>Tipo</label>
       <div class="types" id="types">
         <button type="button" class="chip on" data-type="riunione">Riunione</button>
@@ -213,7 +214,7 @@
       </div>
       <label>Nota</label>
       <textarea id="fNote" maxlength="160" placeholder="Sala, link, persone…"></textarea>
-      <button class="btn save" type="submit">Salva</button>
+      <button class="btn save" type="submit" id="saveBtn">Salva</button>
     </form>
   </div>
 <script>
@@ -248,6 +249,7 @@
   var items = load();
   var pickType = "riunione";
   var pickRep = "none";
+  var editId = null;
 
   function happensOn(item, dayIdx, dateStr){
     if(skipped(item, dateStr)) return false;
@@ -315,7 +317,7 @@
       if(viewingToday() && !shownNow && x.time>now){ html += '<div class="nowbar">adesso<i></i>'+now+'</div>'; shownNow=true; }
       var recurring = x.rep && x.rep!=="none";
       html += '<div class="row'+(focus===x.id?" now":"")+'"><div class="hh">'+esc(x.time)+'</div><div class="rail"><div class="dotline '+esc(x.type)+'"></div></div><div class="card">'+
-        '<div class="acts">'+(recurring?'<button type="button" class="skip" data-skip="'+esc(x.id)+'">Salta giorno</button>':'')+
+        '<div class="acts"><button type="button" class="skip edit" data-edit="'+esc(x.id)+'">Modifica</button>'+(recurring?'<button type="button" class="skip" data-skip="'+esc(x.id)+'">Salta</button>':'')+
         '<button type="button" class="del" data-del="'+esc(x.id)+'">×</button></div>'+
         '<div class="title">'+esc(x.title)+'</div><div class="meta"><span class="tag t-'+esc(x.type)+'">'+esc(LABELS[x.type]||x.type)+'</span>'+
         (recurring?'<span class="rep">'+esc(REPS[x.rep])+'</span> ':'')+esc(x.note||"")+'</div></div></div>';
@@ -356,8 +358,14 @@
     selected=Number(b.getAttribute("data-day")); render();
   };
   $("list").onclick=function(e){
+    var editBtn=e.target.closest("[data-edit]");
     var skipBtn=e.target.closest("[data-skip]");
     var delBtn=e.target.closest("[data-del]");
+    if(editBtn){
+      var item=findItem(editBtn.getAttribute("data-edit"));
+      if(item) openForm(item);
+      return;
+    }
     if(skipBtn){
       var item=findItem(skipBtn.getAttribute("data-skip"));
       if(!item) return;
@@ -373,18 +381,56 @@
   };
   $("types").onclick=function(e){ var b=e.target.closest("[data-type]"); if(!b) return; pickType=b.getAttribute("data-type"); mark("types","data-type",pickType); };
   $("reps").onclick=function(e){ var b=e.target.closest("[data-rep]"); if(!b) return; pickRep=b.getAttribute("data-rep"); mark("reps","data-rep",pickRep); };
-  $("addBtn").onclick=function(){
-    fillDays(); $("form").reset(); $("fTime").value="09:30"; $("fDay").value=String(selected);
-    pickType="riunione"; pickRep="none"; mark("types","data-type",pickType); mark("reps","data-rep",pickRep);
-    $("sheet").className="sheet show";
-  };
+  function openForm(item){
+    fillDays();
+    if(item){
+      editId = item.id;
+      $("formTitle").textContent = "Modifica impegno";
+      $("saveBtn").textContent = "Aggiorna";
+      $("fTitle").value = item.title || "";
+      $("fTime").value = item.time || "09:30";
+      $("fNote").value = item.note || "";
+      pickType = item.type || "riunione";
+      pickRep = item.rep || "none";
+      var day = selected;
+      if(item.rep && item.rep!=="none") day = Number(item.weekday);
+      else {
+        for(var i=0;i<7;i++) if(iso(dateFor(i))===item.date) day = i;
+      }
+      $("fDay").value = String(day);
+    } else {
+      editId = null;
+      $("form").reset();
+      $("formTitle").textContent = "Nuovo impegno";
+      $("saveBtn").textContent = "Salva";
+      $("fTime").value = "09:30";
+      $("fDay").value = String(selected);
+      pickType = "riunione";
+      pickRep = "none";
+    }
+    mark("types","data-type",pickType);
+    mark("reps","data-rep",pickRep);
+    $("sheet").className = "sheet show";
+  }
+  $("addBtn").onclick=function(){ openForm(null); };
   $("talkBtn").onclick=speak;
   $("sheet").onclick=function(e){ if(e.target.id==="sheet") $("sheet").className="sheet"; };
   $("form").onsubmit=function(e){
     if(e&&e.preventDefault) e.preventDefault();
     var title=$("fTitle").value.replace(/^\s+|\s+$/g,""); if(!title) return false;
     var day=Number($("fDay").value);
-    items.push({ id:String(Date.now()), title:title, time:$("fTime").value||"09:30", type:pickType, rep:pickRep, weekday:day, date:iso(dateFor(day)), note:$("fNote").value.replace(/^\s+|\s+$/g,""), skips:[] });
+    var payload = { title:title, time:$("fTime").value||"09:30", type:pickType, rep:pickRep, weekday:day, date:iso(dateFor(day)), note:$("fNote").value.replace(/^\s+|\s+$/g,"") };
+    if(editId){
+      var cur=findItem(editId);
+      if(cur){
+        cur.title=payload.title; cur.time=payload.time; cur.type=payload.type;
+        cur.rep=payload.rep; cur.weekday=payload.weekday; cur.date=payload.date; cur.note=payload.note;
+        if(!cur.skips) cur.skips=[];
+      }
+      editId=null;
+    } else {
+      payload.id=String(Date.now()); payload.skips=[]; items.push(payload);
+    }
     selected=day; persist(); $("sheet").className="sheet"; render(); return false;
   };
   try { render(); } catch(err){ $("speech").textContent="Errore: "+err.message; }
