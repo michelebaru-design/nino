@@ -24,24 +24,29 @@
     .app {
       max-width:480px; margin:0 auto; height:100%;
       display:flex; flex-direction:column;
-      background: linear-gradient(#8ec5ff 0 92px, #cfe4ff 92px 220px, #e7eefc 220px);
+      background: linear-gradient(#9ad0ff 0 80px, #ffe9b8 80px 250px, #e7eefc 250px);
       padding: calc(10px + var(--safe-t)) 12px calc(10px + var(--safe-b));
     }
     header { display:flex; justify-content:space-between; align-items:center; }
     .brand { font-weight:800; font-size:17px; letter-spacing:-.03em; }
     .brand span { color:#2a4ea8; }
-    .navw { display:flex; align-items:center; gap:6px; }
+    .navw { display:flex; align-items:center; gap:8px; margin:8px 0 2px; }
     .navw button {
-      width:30px; height:30px; border-radius:10px; background:#fff; color:var(--navy);
-      font-weight:800; box-shadow:0 4px 10px rgba(42,78,168,.12);
+      width:40px; height:40px; border-radius:14px; background:#fff; color:var(--navy);
+      font-weight:800; font-size:22px; line-height:1; box-shadow:0 4px 10px rgba(42,78,168,.12);
     }
-    .week { font-size:12px; font-weight:700; color:#2a4ea8; min-width:92px; text-align:center; }
-    .hero { display:flex; align-items:flex-end; gap:4px; margin:2px 0 8px; min-height:200px; }
-    .nino-wrap { width:176px; flex:0 0 176px; }
-    .nino { width:176px; height:204px; display:block; }
+    .week {
+      flex:1; width:auto !important; height:auto !important; min-height:40px;
+      font-size:15px !important; font-weight:800; color:#143056;
+      text-align:center; padding:8px 10px; border-radius:14px; background:#fff;
+      line-height:1.2; box-shadow:0 4px 10px rgba(42,78,168,.12);
+    }
+    .hero { display:flex; align-items:flex-end; gap:2px; margin:0 0 6px; min-height:236px; }
+    .nino-wrap { width:210px; flex:0 0 210px; }
+    .nino { width:210px; height:236px; display:block; }
     .bubble {
       flex:1; background:#fff; border-radius:20px 20px 20px 8px;
-      padding:12px 13px; min-height:100px; margin-bottom:22px;
+      padding:12px 13px; min-height:92px; margin-bottom:36px;
       box-shadow:0 10px 24px rgba(42,78,168,.14); position:relative;
     }
     .bubble:before {
@@ -123,52 +128,69 @@
   <div class="app">
     <header>
       <div class="brand">Nino <span>Lavoro</span></div>
-      <div class="navw">
-        <button type="button" id="prevW" aria-label="Settimana precedente">‹</button>
-        <div class="week" id="weekLabel"></div>
-        <button type="button" id="nextW" aria-label="Settimana successiva">›</button>
-      </div>
     </header>
+    <div class="navw">
+      <button type="button" id="prevW" aria-label="Settimana precedente">‹</button>
+      <button type="button" class="week" id="weekLabel"></button>
+      <button type="button" id="nextW" aria-label="Settimana successiva">›</button>
+    </div>
     <section class="hero">
       <div class="nino-wrap bob" id="ninoWrap">
-        <svg class="nino" viewBox="0 0 220 255" aria-hidden="true">
-          <ellipse cx="110" cy="246" rx="52" ry="7" fill="#7aa0d8" opacity=".35"/>
-          <rect x="86" y="208" width="16" height="28" rx="8" fill="#2a3d66"/>
-          <rect x="118" y="208" width="16" height="28" rx="8" fill="#2a3d66"/>
-          <ellipse cx="94" cy="236" rx="13" ry="6" fill="#1b2744"/>
-          <ellipse cx="126" cy="236" rx="13" ry="6" fill="#1b2744"/>
-          <path d="M70 148 C70 132 86 126 110 126 C134 126 150 132 150 148 L156 208 C156 218 140 224 110 224 C80 224 64 218 64 208 Z" fill="#3558a8"/>
-          <path d="M96 138 L110 188 L124 138 Z" fill="#fff"/>
-          <path d="M110 142 L104 166 L110 162 L116 166 Z" fill="#ff5a6a"/>
-          <rect x="52" y="148" width="20" height="46" rx="11" fill="#3558a8"/>
-          <rect x="148" y="148" width="20" height="46" rx="11" fill="#3558a8"/>
-          <circle cx="62" cy="196" r="10" fill="#6ea2ff"/>
-          <circle cx="158" cy="196" r="10" fill="#6ea2ff"/>
-          <ellipse cx="58" cy="86" rx="18" ry="22" fill="#4a7dff"/>
-          <ellipse cx="162" cy="86" rx="18" ry="22" fill="#4a7dff"/>
-          <ellipse cx="58" cy="90" rx="10" ry="13" fill="#fff6c8"/>
-          <ellipse cx="162" cy="90" rx="10" ry="13" fill="#fff6c8"/>
-          <circle cx="110" cy="96" r="62" fill="#4a7dff"/>
-          <ellipse cx="110" cy="118" rx="36" ry="24" fill="#fff"/>
-          <circle cx="78" cy="92" r="22" fill="#fff"/>
-          <circle cx="142" cy="92" r="22" fill="#fff"/>
-          <g class="blink" style="transform-origin:78px 94px">
-            <circle cx="78" cy="94" r="12" fill="#1b2744"/>
-            <circle cx="78" cy="94" r="6" fill="#3aa0ff"/>
-            <circle cx="73" cy="88" r="5" fill="#fff"/>
-            <circle cx="82" cy="97" r="2" fill="#fff"/>
+        <svg class="nino" viewBox="0 0 260 300" aria-hidden="true">
+          <ellipse cx="128" cy="286" rx="62" ry="9" fill="#f2c56a" opacity=".45"/>
+          <!-- feet -->
+          <ellipse cx="108" cy="268" rx="18" ry="10" fill="#fff6c2"/>
+          <ellipse cx="150" cy="268" rx="18" ry="10" fill="#fff6c2"/>
+          <ellipse cx="108" cy="266" rx="11" ry="6" fill="#ffd38a"/>
+          <ellipse cx="150" cy="266" rx="11" ry="6" fill="#ffd38a"/>
+          <!-- tiny work body -->
+          <path d="M88 188 C90 168 104 160 130 160 C156 160 170 168 172 188 L178 238 C178 250 158 258 130 258 C102 258 82 250 82 238 Z" fill="#5aa6ff"/>
+          <path d="M114 168 L130 214 L146 168 Z" fill="#fff"/>
+          <path d="M130 174 L124 198 L130 194 L136 198 Z" fill="#ff6b7a"/>
+          <rect x="68" y="184" width="22" height="48" rx="12" fill="#5aa6ff"/>
+          <rect x="170" y="184" width="22" height="48" rx="12" fill="#5aa6ff"/>
+          <circle cx="79" cy="234" r="11" fill="#ffe08a"/>
+          <circle cx="181" cy="234" r="11" fill="#ffe08a"/>
+          <!-- tail -->
+          <path d="M176 230 Q210 210 214 176" fill="none" stroke="#6eb0ff" stroke-width="10" stroke-linecap="round"/>
+          <circle cx="214" cy="170" r="9" fill="#ffe08a"/>
+          <!-- ears -->
+          <path d="M62 78 L78 28 L108 78 Z" fill="#6eb0ff"/>
+          <path d="M152 78 L182 28 L198 78 Z" fill="#6eb0ff"/>
+          <path d="M76 74 L86 44 L102 74 Z" fill="#ffd0de"/>
+          <path d="M158 74 L174 44 L184 74 Z" fill="#ffd0de"/>
+          <!-- head -->
+          <ellipse cx="130" cy="118" rx="78" ry="74" fill="#7bbcff"/>
+          <ellipse cx="130" cy="138" rx="58" ry="42" fill="#fff7e8"/>
+          <!-- huge eyes -->
+          <g class="blink" style="transform-origin:96px 112px">
+            <ellipse cx="96" cy="114" rx="26" ry="28" fill="#fff"/>
+            <ellipse cx="98" cy="118" rx="16" ry="18" fill="#2a3d7a"/>
+            <ellipse cx="98" cy="120" rx="10" ry="11" fill="#3ec2ff"/>
+            <circle cx="90" cy="108" r="8" fill="#fff"/>
+            <circle cx="104" cy="122" r="3.2" fill="#fff"/>
           </g>
-          <g class="blink" style="transform-origin:142px 94px">
-            <circle cx="142" cy="94" r="12" fill="#1b2744"/>
-            <circle cx="142" cy="94" r="6" fill="#3aa0ff"/>
-            <circle cx="137" cy="88" r="5" fill="#fff"/>
-            <circle cx="146" cy="97" r="2" fill="#fff"/>
+          <g class="blink" style="transform-origin:164px 112px">
+            <ellipse cx="164" cy="114" rx="26" ry="28" fill="#fff"/>
+            <ellipse cx="162" cy="118" rx="16" ry="18" fill="#2a3d7a"/>
+            <ellipse cx="162" cy="120" rx="10" ry="11" fill="#3ec2ff"/>
+            <circle cx="154" cy="108" r="8" fill="#fff"/>
+            <circle cx="168" cy="122" r="3.2" fill="#fff"/>
           </g>
-          <ellipse cx="68" cy="112" rx="8" ry="4" fill="#ff9aa8" opacity=".85"/>
-          <ellipse cx="152" cy="112" rx="8" ry="4" fill="#ff9aa8" opacity=".85"/>
-          <ellipse cx="110" cy="116" rx="7" ry="5" fill="#ff7a88"/>
-          <path d="M102 128 Q110 136 118 128" fill="none" stroke="#1b2744" stroke-width="3" stroke-linecap="round" class="mouth"/>
-          <circle cx="110" cy="176" r="6" fill="#ffd15a"/>
+          <!-- brows + blush -->
+          <path d="M74 86 Q96 78 114 88" fill="none" stroke="#2a3d7a" stroke-width="3.5" stroke-linecap="round"/>
+          <path d="M146 88 Q164 78 186 86" fill="none" stroke="#2a3d7a" stroke-width="3.5" stroke-linecap="round"/>
+          <ellipse cx="72" cy="142" rx="14" ry="8" fill="#ff9db0" opacity=".8"/>
+          <ellipse cx="188" cy="142" rx="14" ry="8" fill="#ff9db0" opacity=".8"/>
+          <!-- tiny nose + tender mouth -->
+          <ellipse cx="130" cy="142" rx="6" ry="4.5" fill="#ff8aa0"/>
+          <path class="mouth" d="M118 156 Q130 168 142 156" fill="none" stroke="#2a3d7a" stroke-width="3.4" stroke-linecap="round"/>
+          <!-- big sweat drop -->
+          <path d="M208 70 C208 70 230 102 214 118 C204 128 192 118 198 100 C202 88 208 70 208 70 Z" fill="#bfe9ff" stroke="#7ec8f0" stroke-width="3"/>
+          <ellipse cx="208" cy="96" rx="4" ry="6" fill="#fff" opacity=".8"/>
+          <!-- whiskers -->
+          <path d="M54 138 H20 M56 148 H22" stroke="#2a3d7a" stroke-width="2.2" stroke-linecap="round" opacity=".45"/>
+          <path d="M206 138 H240 M204 148 H238" stroke="#2a3d7a" stroke-width="2.2" stroke-linecap="round" opacity=".45"/>
         </svg>
       </div>
       <div class="bubble">
@@ -289,14 +311,19 @@
     for(var i=0;i<rows.length;i++) if(rows[i].time>=now){ next=rows[i].id; break; }
     return next || rows[rows.length-1].id;
   }
+  var MESI = ["gen","feb","mar","apr","mag","giu","lug","ago","set","ott","nov","dic"];
   function fmtRange(){
     var a=dateFor(0), b=dateFor(6);
-    var label = a.getDate()+"/"+(a.getMonth()+1)+" – "+b.getDate()+"/"+(b.getMonth()+1);
-    if(weekOff===0) label = "questa · "+label;
-    return label;
+    var left = a.getDate()+" "+MESI[a.getMonth()];
+    var right = b.getDate()+" "+MESI[b.getMonth()];
+    if(weekOff===0) return "Questa settimana\n"+left+" – "+right;
+    if(weekOff===1) return "Prossima settimana\n"+left+" – "+right;
+    if(weekOff===-1) return "Settimana scorsa\n"+left+" – "+right;
+    if(weekOff>1) return "Tra "+weekOff+" settimane\n"+left+" – "+right;
+    return (-weekOff)+" settimane fa\n"+left+" – "+right;
   }
   function render(){
-    $("weekLabel").textContent = fmtRange();
+    $("weekLabel").innerText = fmtRange();
     $("sToday").textContent = ofDay(selected).length;
     $("sTodayL").textContent = viewingToday() ? "OGGI" : DAYS[selected].toUpperCase();
     $("sWeek").textContent = uniqueWeekCount();
