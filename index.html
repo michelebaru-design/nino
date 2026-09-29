@@ -5,404 +5,343 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Nino">
-  <meta name="theme-color" content="#1a4d9e">
+  <meta name="apple-mobile-web-app-title" content="Nino Lavoro">
+  <meta name="theme-color" content="#143056">
   <meta name="mobile-web-app-capable" content="yes">
-  <title>Nino — i tuoi impegni</title>
+  <title>Nino Lavoro</title>
   <style>
     :root {
-      --blue:#2b6fe0; --blue-d:#1a4d9e; --ink:#12203a; --muted:#5b6b86;
-      --card:#fff; --bg:#eef4ff; --bad:#e24b4b;
-      --safe-top: env(safe-area-inset-top, 0px);
-      --safe-bot: env(safe-area-inset-bottom, 0px);
+      --navy:#143056; --blue:#2b6fe0; --ink:#12203a; --muted:#5b6b86; --bad:#c43c3c;
+      --safe-t: env(safe-area-inset-top, 0px);
+      --safe-b: env(safe-area-inset-bottom, 0px);
     }
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
     html, body { margin:0; height:100%; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-      background: radial-gradient(1200px 500px at 50% -80px, #b9d4ff 0%, transparent 60%),
-                  linear-gradient(#cfe0ff, var(--bg) 38%);
-      color: var(--ink);
-      overflow: hidden;
+      font-family:-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+      color:var(--ink); background:#d9e4f4; overflow:hidden;
     }
     .app {
-      height: 100%;
-      max-width: 480px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      padding: calc(12px + var(--safe-top)) 14px calc(12px + var(--safe-bot));
+      max-width:480px; margin:0 auto; height:100%;
+      display:flex; flex-direction:column;
+      background: linear-gradient(#17345f 0 210px, #d9e4f4 210px);
+      padding: calc(10px + var(--safe-t)) 12px calc(10px + var(--safe-b));
     }
-    header.top { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
-    .brand { font-weight:800; letter-spacing:-.03em; font-size:18px; }
-    .brand span { color: var(--blue); }
-    .week-label { font-size:12px; color:var(--muted); font-weight:600; }
-    .stage { display:grid; grid-template-columns:128px 1fr; gap:10px; align-items:center; min-height:148px; }
-    .nino-wrap { height:148px; }
-    .nino { width:128px; height:148px; }
+    header { display:flex; justify-content:space-between; align-items:center; color:#fff; }
+    .brand { font-weight:800; font-size:17px; letter-spacing:-.03em; }
+    .brand span { opacity:.72; font-weight:700; }
+    .week { font-size:12px; opacity:.8; font-weight:600; }
+    .hero { display:flex; align-items:flex-end; gap:6px; margin:2px 0 8px; min-height:188px; }
+    .nino-wrap { width:168px; flex:0 0 168px; }
+    .nino { width:168px; height:188px; display:block; }
     .bubble {
-      background:#fff; border-radius:18px 18px 18px 6px; padding:12px 14px;
-      box-shadow: 0 10px 28px rgba(26,77,158,.12); min-height:88px; position:relative;
+      flex:1; background:#fff; border-radius:18px 18px 18px 8px;
+      padding:12px 13px; min-height:96px; margin-bottom:18px;
+      box-shadow:0 10px 24px rgba(0,0,0,.12); position:relative;
     }
     .bubble:before {
-      content:""; position:absolute; left:-8px; top:28px;
+      content:""; position:absolute; left:-8px; bottom:28px;
       border:8px solid transparent; border-right-color:#fff; border-left:0;
     }
-    .who { font-size:11px; font-weight:800; color:var(--blue); letter-spacing:.04em; text-transform:uppercase; }
-    .say { margin:4px 0 0; font-size:15px; line-height:1.35; font-weight:650; }
+    .who { font-size:11px; font-weight:800; color:var(--blue); text-transform:uppercase; letter-spacing:.04em; }
+    .say { margin:5px 0 0; font-size:15px; line-height:1.35; font-weight:650; }
     .say small { display:block; margin-top:6px; color:var(--muted); font-weight:500; font-size:12px; }
-    .actions { display:flex; gap:8px; margin:10px 0 12px; }
+    .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin-bottom:8px; }
+    .stat { background:#fff; border-radius:14px; padding:8px; text-align:center; }
+    .stat b { display:block; font-size:18px; }
+    .stat span { font-size:10px; color:var(--muted); font-weight:800; letter-spacing:.03em; }
+    .actions { display:flex; gap:8px; margin-bottom:8px; }
     button { font:inherit; border:0; cursor:pointer; }
-    .btn {
-      flex:1; background:var(--blue); color:#fff; border-radius:14px;
-      padding:12px 10px; font-weight:750; font-size:14px;
-      box-shadow: 0 8px 16px rgba(43,111,224,.28);
-    }
-    .btn.ghost { background:#fff; color:var(--blue-d); box-shadow:0 6px 14px rgba(18,32,58,.06); }
-    .days { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-bottom:10px; }
-    .day {
-      background:#fff; border-radius:14px; padding:8px 0 7px; text-align:center;
-      box-shadow: 0 4px 10px rgba(18,32,58,.05);
-    }
-    .day.on { background:var(--blue); color:#fff; }
-    .day .dn { font-size:10px; font-weight:800; opacity:.7; }
-    .day .dd { font-size:15px; font-weight:800; margin-top:2px; }
-    .day .dot { width:5px; height:5px; border-radius:50%; margin:5px auto 0; background:transparent; }
+    .btn { flex:1; background:var(--blue); color:#fff; border-radius:14px; padding:12px 8px; font-weight:750; font-size:14px; }
+    .btn.ghost { background:#fff; color:var(--navy); }
+    .days { display:grid; grid-template-columns:repeat(7,1fr); gap:5px; margin-bottom:8px; }
+    .day { background:#fff; border-radius:13px; padding:7px 0 6px; text-align:center; }
+    .day.on { background:var(--navy); color:#fff; }
+    .day .dn { font-size:10px; font-weight:800; opacity:.65; }
+    .day .dd { font-size:14px; font-weight:800; }
+    .day .dot { width:5px; height:5px; border-radius:50%; margin:4px auto 0; background:transparent; }
     .day.has .dot { background:#ffd15a; }
     .day.on.has .dot { background:#fff; }
-    .list {
-      flex:1; overflow:auto; background:#fff; border-radius:22px; padding:8px;
-      box-shadow: 0 14px 30px rgba(26,77,158,.08);
+    .board { flex:1; overflow:auto; background:#fff; border-radius:20px; padding:12px 10px 16px; }
+    .empty { text-align:center; color:var(--muted); padding:36px 12px; font-weight:600; }
+    .row { display:grid; grid-template-columns:52px 14px 1fr; gap:0 8px; min-height:64px; }
+    .hh { font-weight:800; color:var(--navy); font-size:13px; padding-top:2px; }
+    .rail { position:relative; }
+    .rail:before { content:""; position:absolute; left:5px; top:10px; bottom:-8px; width:2px; background:#d7e2f2; }
+    .row:last-child .rail:before { display:none; }
+    .dotline { width:12px; height:12px; border-radius:50%; background:var(--blue); border:3px solid #d7e6ff; margin-top:3px; position:relative; z-index:1; }
+    .dotline.scadenza { background:#e08a16; border-color:#ffe0bd; }
+    .dotline.call { background:#1f9d6a; border-color:#cfeedf; }
+    .dotline.task { background:#6b3cc3; border-color:#eadbff; }
+    .card { background:#f5f8fd; border-radius:14px; padding:9px 10px; margin-bottom:8px; }
+    .now .card { outline:2px solid var(--blue); background:#eef4ff; }
+    .title { font-weight:750; font-size:15px; padding-right:78px; }
+    .meta { color:var(--muted); font-size:12px; margin-top:3px; }
+    .tag { display:inline-block; font-size:10px; font-weight:800; padding:2px 6px; border-radius:999px; margin-right:4px; }
+    .t-riunione { background:#e7efff; color:#1d4fbf; }
+    .t-scadenza { background:#ffe8d6; color:#b35400; }
+    .t-call { background:#e7f8ef; color:#0f7a4a; }
+    .t-task { background:#f1e9ff; color:#6b3cc3; }
+    .rep { font-size:10px; font-weight:800; color:var(--blue); }
+    .acts { float:right; display:flex; gap:4px; margin:-2px 0 0; }
+    .del, .skip {
+      height:28px; border-radius:9px; background:#fff; font-size:11px; font-weight:800; padding:0 8px;
     }
-    .empty { text-align:center; color:var(--muted); padding:36px 16px; font-weight:600; }
-    .item {
-      display:grid; grid-template-columns:58px 1fr auto; gap:10px;
-      align-items:center; padding:11px 10px; border-radius:16px;
-    }
-    .item + .item { border-top:1px solid #eef2f8; }
-    .when { font-weight:800; color:var(--blue-d); font-size:14px; }
-    .title { font-weight:750; font-size:15px; }
-    .note { color:var(--muted); font-size:12px; margin-top:2px; }
-    .del { width:36px; height:36px; border-radius:12px; background:#fff1f1; color:var(--bad); font-size:18px; }
-    .sheet {
-      position:fixed; inset:0; background:rgba(10,18,36,.45);
-      display:none; align-items:flex-end; justify-content:center; z-index:20;
-    }
+    .del { color:var(--bad); width:28px; padding:0; font-size:16px; }
+    .skip { color:var(--navy); }
+    .nowbar { grid-column:1 / -1; display:flex; align-items:center; gap:8px; color:#c43c3c; font-size:11px; font-weight:800; margin:2px 0 8px; }
+    .nowbar i { flex:1; height:2px; background:#f3c4c4; display:block; }
+    .sheet { position:fixed; inset:0; background:rgba(8,16,32,.45); display:none; align-items:flex-end; justify-content:center; z-index:20; }
     .sheet.show { display:flex; }
-    .panel {
-      width:min(480px,100%); background:#fff; border-radius:24px 24px 0 0;
-      padding:16px 16px calc(18px + var(--safe-bot));
-    }
-    .grab { width:42px; height:5px; background:#d9e1ee; border-radius:99px; margin:0 auto 12px; }
-    h2 { margin:0 0 12px; font-size:18px; }
+    .panel { width:min(480px,100%); background:#fff; border-radius:24px 24px 0 0; padding:16px 16px calc(16px + var(--safe-b)); max-height:92%; overflow:auto; }
+    .grab { width:40px; height:5px; background:#d7deea; border-radius:99px; margin:0 auto 12px; }
+    h2 { margin:0 0 8px; font-size:18px; }
     label { display:block; font-size:12px; font-weight:700; color:var(--muted); margin:10px 0 6px; }
-    input, select, textarea {
-      width:100%; font:inherit; border:1.5px solid #dbe4f3; border-radius:14px;
-      padding:12px; background:#f7faff; outline:none;
-    }
-    textarea { min-height:72px; resize:none; }
+    input, select, textarea { width:100%; font:inherit; border:1.5px solid #dbe4f3; border-radius:14px; padding:12px; background:#f7faff; outline:none; }
+    textarea { min-height:64px; resize:none; }
     .row2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .types, .reps { display:grid; gap:6px; }
+    .types { grid-template-columns:repeat(4,1fr); }
+    .reps { grid-template-columns:repeat(4,1fr); }
+    .chip { background:#f3f6fb; border-radius:12px; padding:9px 4px; font-size:11px; font-weight:800; }
+    .chip.on { background:var(--navy); color:#fff; }
     .save { width:100%; margin-top:14px; }
-    .blink { animation: blink 4.4s infinite; }
+    .bob { animation:bob 2.8s ease-in-out infinite; transform-origin:50% 100%; }
+    @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
+    .blink { animation:blink 4.6s infinite; }
     @keyframes blink { 0%,92%,100%{transform:scaleY(1)} 94%{transform:scaleY(.08)} }
-    .bob { animation: bob 2.6s ease-in-out infinite; transform-origin:50% 90%; }
-    @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
-    .talking .mouth { animation: talk .28s infinite alternate; }
-    @keyframes talk { from{transform:scaleY(.5)} to{transform:scaleY(1.15)} }
-    .warn { color:#b42318; font-size:13px; padding:8px 0; }
+    .talking .mouth { animation:talk .26s infinite alternate; }
+    @keyframes talk { from{transform:scaleY(.45)} to{transform:scaleY(1.2)} }
   </style>
 </head>
 <body>
   <div class="app">
-    <header class="top">
-      <div class="brand">Nino <span>Settimana</span></div>
-      <div class="week-label" id="weekLabel">settimana</div>
+    <header>
+      <div class="brand">Nino <span>Lavoro</span></div>
+      <div class="week" id="weekLabel"></div>
     </header>
-
-    <section class="stage">
+    <section class="hero">
       <div class="nino-wrap bob" id="ninoWrap">
-        <svg class="nino" viewBox="0 0 160 190" aria-hidden="true">
-          <ellipse cx="80" cy="178" rx="46" ry="8" fill="#9bb7e6" opacity=".45"/>
-          <circle cx="80" cy="108" r="62" fill="#2b6fe0"/>
-          <circle cx="80" cy="118" r="34" fill="#fff"/>
-          <circle cx="80" cy="78" r="48" fill="#2b6fe0"/>
-          <ellipse cx="80" cy="102" rx="28" ry="18" fill="#fff"/>
-          <g class="blink" style="transform-origin:56px 78px">
-            <circle cx="56" cy="78" r="11" fill="#fff"/>
-            <circle cx="56" cy="79" r="5.2" fill="#1a2438"/>
-            <circle cx="53.5" cy="76.5" r="2" fill="#fff"/>
-          </g>
-          <g class="blink" style="transform-origin:104px 78px">
-            <circle cx="104" cy="78" r="11" fill="#fff"/>
-            <circle cx="104" cy="79" r="5.2" fill="#1a2438"/>
-            <circle cx="101.5" cy="76.5" r="2" fill="#fff"/>
-          </g>
-          <ellipse cx="80" cy="96" rx="7" ry="5.5" fill="#e85b5b"/>
-          <ellipse class="mouth" cx="80" cy="112" rx="8" ry="5" fill="#1a2438"/>
-          <circle cx="80" cy="146" r="7" fill="#ffd15a" stroke="#e0b12d" stroke-width="2"/>
-          <path d="M48 58 C58 42, 102 42, 112 58" fill="none" stroke="#1a4d9e" stroke-width="6" stroke-linecap="round"/>
-          <circle cx="48" cy="58" r="7" fill="#2b6fe0" stroke="#1a4d9e" stroke-width="3"/>
-          <circle cx="112" cy="58" r="7" fill="#2b6fe0" stroke="#1a4d9e" stroke-width="3"/>
+        <svg class="nino" viewBox="0 0 200 230" aria-hidden="true">
+          <ellipse cx="100" cy="222" rx="54" ry="7" fill="#0b1b33" opacity=".22"/>
+          <rect x="72" y="188" width="18" height="26" rx="6" fill="#1a2a44"/>
+          <rect x="110" y="188" width="18" height="26" rx="6" fill="#1a2a44"/>
+          <rect x="68" y="208" width="26" height="10" rx="4" fill="#0e1726"/>
+          <rect x="106" y="208" width="26" height="10" rx="4" fill="#0e1726"/>
+          <path d="M58 128 C58 118 70 112 100 112 C130 112 142 118 142 128 L148 188 C148 196 140 200 100 200 C60 200 52 196 52 188 Z" fill="#1c3358"/>
+          <path d="M86 120 L100 168 L114 120 Z" fill="#f4f7fb"/>
+          <path d="M100 124 L94 148 L100 144 L106 148 Z" fill="#c43c3c"/>
+          <path d="M86 120 L100 132 L114 120" fill="none" stroke="#d7dee8" stroke-width="2"/>
+          <rect x="42" y="128" width="20" height="52" rx="10" fill="#1c3358"/>
+          <rect x="138" y="128" width="20" height="52" rx="10" fill="#1c3358"/>
+          <circle cx="52" cy="182" r="9" fill="#2b6fe0"/>
+          <circle cx="148" cy="182" r="9" fill="#2b6fe0"/>
+          <circle cx="100" cy="78" r="50" fill="#2b6fe0"/>
+          <ellipse cx="100" cy="96" rx="28" ry="16" fill="#fff"/>
+          <path d="M62 60 C78 38 122 38 138 60" fill="none" stroke="#16325c" stroke-width="7" stroke-linecap="round"/>
+          <rect x="68" y="68" width="26" height="18" rx="6" fill="none" stroke="#0e1726" stroke-width="3"/>
+          <rect x="106" y="68" width="26" height="18" rx="6" fill="none" stroke="#0e1726" stroke-width="3"/>
+          <path d="M94 77 H106" stroke="#0e1726" stroke-width="3"/>
+          <g class="blink" style="transform-origin:81px 77px"><circle cx="81" cy="77" r="5.2" fill="#1a2438"/><circle cx="79" cy="75" r="1.6" fill="#fff"/></g>
+          <g class="blink" style="transform-origin:119px 77px"><circle cx="119" cy="77" r="5.2" fill="#1a2438"/><circle cx="117" cy="75" r="1.6" fill="#fff"/></g>
+          <ellipse cx="100" cy="92" rx="6.5" ry="5" fill="#e85b5b"/>
+          <ellipse class="mouth" cx="100" cy="108" rx="8" ry="5" fill="#1a2438"/>
+          <rect x="118" y="142" width="10" height="8" rx="1" fill="#ffd15a"/>
         </svg>
       </div>
       <div class="bubble">
-        <div class="who">Nino</div>
-        <div class="say" id="speech">Ciao! Se leggi ancora questa riga, apri il file con Safari, non con l’anteprima di File.</div>
+        <div class="who">Nino · in giacca</div>
+        <div class="say" id="speech">Preparo la timeline…</div>
       </div>
     </section>
-
+    <div class="stats">
+      <div class="stat"><b id="sToday">0</b><span>OGGI</span></div>
+      <div class="stat"><b id="sWeek">0</b><span>SETTIMANA</span></div>
+      <div class="stat"><b id="sDead">0</b><span>SCADENZE</span></div>
+    </div>
     <div class="actions">
-      <button type="button" class="btn" id="talkBtn">Parlami</button>
+      <button type="button" class="btn" id="talkBtn">Briefing</button>
       <button type="button" class="btn ghost" id="addBtn">+ Impegno</button>
     </div>
-
     <div class="days" id="days"></div>
-    <div class="list" id="list"><div class="empty">Apro la settimana…</div></div>
+    <div class="board" id="list"></div>
   </div>
-
   <div class="sheet" id="sheet">
     <form class="panel" id="form" action="javascript:void(0)">
       <div class="grab"></div>
-      <h2>Nuovo impegno</h2>
-      <label>Cosa</label>
-      <input id="fTitle" required maxlength="80" placeholder="Es. Dentista, allenamento, cena…">
-      <div class="row2">
-        <div>
-          <label>Giorno</label>
-          <select id="fDay"></select>
-        </div>
-        <div>
-          <label>Ora</label>
-          <input id="fTime" type="time" value="09:00" required>
-        </div>
+      <h2>Impegno di lavoro</h2>
+      <label>Tipo</label>
+      <div class="types" id="types">
+        <button type="button" class="chip on" data-type="riunione">Riunione</button>
+        <button type="button" class="chip" data-type="call">Call</button>
+        <button type="button" class="chip" data-type="scadenza">Scadenza</button>
+        <button type="button" class="chip" data-type="task">Task</button>
       </div>
-      <label>Nota (opzionale)</label>
-      <textarea id="fNote" maxlength="160" placeholder="Dettagli, luogo…"></textarea>
+      <label>Cosa</label>
+      <input id="fTitle" required maxlength="90" placeholder="Es. standup, report, call cliente">
+      <div class="row2">
+        <div><label>Giorno</label><select id="fDay"></select></div>
+        <div><label>Ora</label><input id="fTime" type="time" value="09:30" required></div>
+      </div>
+      <label>Ricorrenza</label>
+      <div class="reps" id="reps">
+        <button type="button" class="chip on" data-rep="none">Solo quel giorno</button>
+        <button type="button" class="chip" data-rep="weekly">Ogni settimana</button>
+        <button type="button" class="chip" data-rep="weekdays">Lun-Ven</button>
+        <button type="button" class="chip" data-rep="daily">Tutti i giorni</button>
+      </div>
+      <label>Nota</label>
+      <textarea id="fNote" maxlength="160" placeholder="Sala, link, persone…"></textarea>
       <button class="btn save" type="submit">Salva</button>
     </form>
   </div>
-
 <script>
 (function () {
   var DAYS = ["Lun","Mar","Mer","Gio","Ven","Sab","Dom"];
   var DAYS_LONG = ["lunedì","martedì","mercoledì","giovedì","venerdì","sabato","domenica"];
-  var KEY = "nino-impegni-v1";
-
-  function $(id) { return document.getElementById(id); }
-
-  function todayIndex() {
-    var d = new Date().getDay();
-    return d === 0 ? 6 : d - 1;
+  var LABELS = { riunione:"Riunione", call:"Call", scadenza:"Scadenza", task:"Task" };
+  var REPS = { none:"una tantum", weekly:"ogni settimana", weekdays:"lun-ven", daily:"tutti i giorni" };
+  var KEY = "nino-lavoro-v2";
+  function $(id){ return document.getElementById(id); }
+  function pad(n){ return (n<10?"0":"")+n; }
+  function todayIndex(){ var d=new Date().getDay(); return d===0?6:d-1; }
+  function monday(){ var d=new Date(); var day=d.getDay(); d.setDate(d.getDate()+(day===0?-6:1-day)); d.setHours(12,0,0,0); return d; }
+  function dateFor(i){ var m=monday(); m.setDate(m.getDate()+i); return m; }
+  function iso(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+  function load(){ try{ var x=JSON.parse(localStorage.getItem(KEY)||"[]"); return x instanceof Array?x:[]; }catch(e){ return []; } }
+  function persist(){ try{ localStorage.setItem(KEY, JSON.stringify(items)); }catch(e){} }
+  function esc(s){ return String(s).replace(/[&<>"']/g, function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];}); }
+  function nowHHMM(){ var d=new Date(); return pad(d.getHours())+":"+pad(d.getMinutes()); }
+  function skipped(item, dateStr){
+    var s = item.skips || [];
+    for(var i=0;i<s.length;i++) if(s[i]===dateStr) return true;
+    return false;
   }
-
-  function mondayOfWeek() {
-    var d = new Date();
-    var day = d.getDay();
-    var diff = day === 0 ? -6 : 1 - day;
-    d.setDate(d.getDate() + diff);
-    d.setHours(12,0,0,0);
-    return d;
-  }
-
-  function dateFor(i) {
-    var m = mondayOfWeek();
-    m.setDate(m.getDate() + i);
-    return m;
-  }
-
-  function load() {
-    try {
-      var raw = localStorage.getItem(KEY);
-      var data = raw ? JSON.parse(raw) : [];
-      return Array.isArray(data) ? data : [];
-    } catch (e) {
-      return [];
-    }
-  }
-
-  function persist(items) {
-    try { localStorage.setItem(KEY, JSON.stringify(items)); } catch (e) {}
-  }
-
-  function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, function (c) {
-      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
-    });
-  }
-
   var selected = todayIndex();
   var items = load();
-
-  function itemsOf(day) {
-    return items.filter(function (x) { return Number(x.day) === day; })
-      .sort(function (a,b) { return String(a.time).localeCompare(String(b.time)); });
+  var pickType = "riunione";
+  var pickRep = "none";
+  function happensOn(item, dayIdx, dateStr){
+    if(skipped(item, dateStr)) return false;
+    var r = item.rep || "none";
+    if(r==="daily") return true;
+    if(r==="weekdays") return dayIdx <= 4;
+    if(r==="weekly") return Number(item.weekday) === dayIdx;
+    return item.date === dateStr;
   }
-
-  function phrase() {
-    var today = todayIndex();
-    var weekN = items.length;
-    var todayItems = itemsOf(selected);
-    var todayAll = itemsOf(today);
-    var busyDay = [0,1,2,3,4,5,6].map(function (i) { return itemsOf(i).length; });
-    var max = Math.max.apply(null, busyDay);
-    var maxDay = busyDay.indexOf(max);
-    var selectedIsToday = selected === today;
-
-    if (!weekN) {
-      return { main: "Questa settimana è vuota. Vuoi aggiungere il primo impegno?", sub: "Tocca + Impegno e te lo ricordo io." };
+  function ofDay(dayIdx){
+    var dateStr = iso(dateFor(dayIdx));
+    return items.filter(function(x){ return happensOn(x, dayIdx, dateStr); })
+      .sort(function(a,b){ return String(a.time).localeCompare(String(b.time)); });
+  }
+  function uniqueWeekCount(){ var n=0; for(var i=0;i<7;i++) n += ofDay(i).length; return n; }
+  function weekDead(){
+    var n=0; for(var i=0;i<7;i++) ofDay(i).forEach(function(x){ if(x.type==="scadenza") n++; }); return n;
+  }
+  function phrase(){
+    var today=todayIndex(), rows=ofDay(selected), todayRows=ofDay(today);
+    var weekN=uniqueWeekCount(), dead=weekDead(), isToday=selected===today;
+    if(!items.length) return { main:"Nessun impegno in archivio. Carichiamo la prima riunione?", sub:"Puoi farla ripetere, o saltare solo un giorno." };
+    if(isToday && !todayRows.length) return { main:"Oggi l’agenda è libera.", sub: weekN+" cose in settimana"+(dead?(", "+dead+" scadenze."):".") };
+    if(!rows.length) return { main:"Niente in timeline per "+DAYS_LONG[selected]+".", sub: todayRows.length?("Oggi invece hai "+todayRows.length+" impegni."):("In settimana risultano "+weekN+" slot.") };
+    var first=rows[0];
+    var label=isToday?"Oggi":(DAYS_LONG[selected].charAt(0).toUpperCase()+DAYS_LONG[selected].slice(1));
+    if(rows.length===1) return { main: label+" in agenda alle "+first.time+": "+first.title+".", sub: (LABELS[first.type]||"")+(first.rep && first.rep!=="none"?" · "+REPS[first.rep]:"") };
+    return { main: label+" hai "+rows.length+" impegni, dal "+rows[0].time+" al "+rows[rows.length-1].time+".", sub: rows.map(function(x){ return x.time+" "+x.title; }).join(", ")+"." };
+  }
+  function nearestId(rows){
+    if(selected!==todayIndex() || !rows.length) return null;
+    var now=nowHHMM(), next=null;
+    for(var i=0;i<rows.length;i++) if(rows[i].time>=now){ next=rows[i].id; break; }
+    return next || rows[rows.length-1].id;
+  }
+  function render(){
+    var a=dateFor(0), b=dateFor(6);
+    $("weekLabel").textContent = a.getDate()+"/"+(a.getMonth()+1)+" – "+b.getDate()+"/"+(b.getMonth()+1);
+    $("sToday").textContent = ofDay(todayIndex()).length;
+    $("sWeek").textContent = uniqueWeekCount();
+    $("sDead").textContent = weekDead();
+    var p=phrase();
+    $("speech").innerHTML = p.main+(p.sub?"<small>"+esc(p.sub)+"</small>":"");
+    var days="";
+    for(var i=0;i<7;i++){
+      var d=dateFor(i);
+      days += '<button type="button" class="day'+(i===selected?" on":"")+(ofDay(i).length?" has":"")+'" data-day="'+i+'"><div class="dn">'+DAYS[i]+'</div><div class="dd">'+d.getDate()+'</div><div class="dot"></div></button>';
     }
-    if (selectedIsToday && todayAll.length === 0) {
-      return { main: "Oggi sei libero. In settimana hai " + weekN + (weekN===1?" impegno.":" impegni."), sub: max ? ("Il giorno più pieno è " + DAYS_LONG[maxDay] + ".") : "" };
+    $("days").innerHTML=days;
+    var rows=ofDay(selected);
+    if(!rows.length){ $("list").innerHTML='<div class="empty">Timeline vuota.<br>Nino aspetta il primo impegno.</div>'; return; }
+    var focus=nearestId(rows), now=nowHHMM(), html='<div class="tl">', shownNow=false;
+    for(var j=0;j<rows.length;j++){
+      var x=rows[j];
+      if(selected===todayIndex() && !shownNow && x.time>now){ html += '<div class="nowbar">adesso<i></i>'+now+'</div>'; shownNow=true; }
+      var recurring = x.rep && x.rep!=="none";
+      html += '<div class="row'+(focus===x.id?" now":"")+'"><div class="hh">'+esc(x.time)+'</div><div class="rail"><div class="dotline '+esc(x.type)+'"></div></div><div class="card">'+
+        '<div class="acts">'+(recurring?'<button type="button" class="skip" data-skip="'+esc(x.id)+'">Salta oggi</button>':'')+
+        '<button type="button" class="del" data-del="'+esc(x.id)+'">×</button></div>'+
+        '<div class="title">'+esc(x.title)+'</div><div class="meta"><span class="tag t-'+esc(x.type)+'">'+esc(LABELS[x.type]||x.type)+'</span>'+
+        (recurring?'<span class="rep">'+esc(REPS[x.rep])+'</span> ':'')+esc(x.note||"")+'</div></div></div>';
     }
-    if (todayItems.length === 0) {
-      return { main: "Nessun impegno per " + DAYS_LONG[selected] + ".", sub: todayAll.length ? ("Oggi invece ne hai " + todayAll.length + ".") : ("In settimana ce ne sono " + weekN + ".") };
-    }
-    var first = todayItems[0];
-    if (todayItems.length === 1) {
-      var label = selectedIsToday ? "Oggi" : (DAYS_LONG[selected].charAt(0).toUpperCase() + DAYS_LONG[selected].slice(1));
-      return { main: label + " hai solo: " + first.title + " alle " + first.time + ".", sub: first.note || "Giornata gestibile." };
-    }
-    var list = todayItems.map(function (x) { return x.time + " " + x.title; }).join(", ");
-    var label2 = selectedIsToday ? "Oggi" : (DAYS_LONG[selected].charAt(0).toUpperCase() + DAYS_LONG[selected].slice(1));
-    return { main: label2 + " hai " + todayItems.length + " impegni.", sub: list + "." };
+    if(selected===todayIndex() && !shownNow) html += '<div class="nowbar">adesso<i></i>'+now+'</div>';
+    $("list").innerHTML = html+"</div>";
   }
-
-  function renderSpeech() {
-    var p = phrase();
-    $("speech").innerHTML = p.main + (p.sub ? "<small>" + escapeHtml(p.sub) + "</small>" : "");
+  function speak(){
+    var p=phrase(), wrap=$("ninoWrap");
+    wrap.className="nino-wrap bob talking";
+    if(!window.speechSynthesis){ setTimeout(function(){ wrap.className="nino-wrap bob"; },1600); return; }
+    speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance((p.main+" "+(p.sub||"")).trim());
+    u.lang="it-IT"; u.rate=1.02; u.pitch=1.1;
+    u.onend=function(){ wrap.className="nino-wrap bob"; };
+    speechSynthesis.speak(u);
   }
-
-  function renderDays() {
-    var html = "";
-    for (var i = 0; i < 7; i++) {
-      var d = dateFor(i);
-      var has = itemsOf(i).length > 0;
-      var on = i === selected ? " on" : "";
-      html += '<button type="button" class="day' + on + (has ? " has" : "") + '" data-day="' + i + '">' +
-        '<div class="dn">' + DAYS[i] + '</div>' +
-        '<div class="dd">' + d.getDate() + '</div>' +
-        '<div class="dot"></div></button>';
-    }
-    $("days").innerHTML = html;
+  function fillDays(){
+    var html=""; for(var i=0;i<7;i++) html += '<option value="'+i+'">'+DAYS[i]+" "+dateFor(i).getDate()+'</option>';
+    $("fDay").innerHTML=html; $("fDay").value=String(selected);
   }
-
-  function renderList() {
-    var rows = itemsOf(selected);
-    if (!rows.length) {
-      $("list").innerHTML = '<div class="empty">Niente in programma.<br>Nino sta facendo un pisolino.</div>';
-      return;
-    }
-    var html = "";
-    for (var i = 0; i < rows.length; i++) {
-      var x = rows[i];
-      html += '<div class="item"><div class="when">' + escapeHtml(x.time) + '</div><div>' +
-        '<div class="title">' + escapeHtml(x.title) + '</div>' +
-        (x.note ? '<div class="note">' + escapeHtml(x.note) + '</div>' : '') +
-        '</div><button type="button" class="del" data-id="' + escapeHtml(x.id) + '">×</button></div>';
-    }
-    $("list").innerHTML = html;
+  function mark(group, attr, value){
+    var all=$(group).querySelectorAll(".chip");
+    for(var i=0;i<all.length;i++) all[i].className="chip"+(all[i].getAttribute(attr)===value?" on":"");
   }
-
-  function fmtWeek() {
-    var a = dateFor(0), b = dateFor(6);
-    $("weekLabel").textContent = a.getDate() + "/" + (a.getMonth()+1) + " – " + b.getDate() + "/" + (b.getMonth()+1);
-  }
-
-  function render() {
-    fmtWeek();
-    renderDays();
-    renderList();
-    renderSpeech();
-  }
-
-  function speak() {
-    var p = phrase();
-    var text = (p.main + " " + (p.sub || "")).trim();
-    var wrap = $("ninoWrap");
-    wrap.className = "nino-wrap bob talking";
-    if (!window.speechSynthesis) {
-      setTimeout(function () { wrap.className = "nino-wrap bob"; }, 1600);
-      return;
-    }
-    window.speechSynthesis.cancel();
-    var u = new SpeechSynthesisUtterance(text);
-    u.lang = "it-IT";
-    u.rate = 1.02;
-    u.pitch = 1.15;
-    u.onend = function () { wrap.className = "nino-wrap bob"; };
-    window.speechSynthesis.speak(u);
-  }
-
-  function fillDaySelect() {
-    var html = "";
-    for (var i = 0; i < 7; i++) {
-      var d = dateFor(i);
-      html += '<option value="' + i + '">' + DAYS[i] + " " + d.getDate() + "</option>";
-    }
-    $("fDay").innerHTML = html;
-    $("fDay").value = String(selected);
-  }
-
-  function openSheet() {
-    fillDaySelect();
-    $("form").reset();
-    $("fTime").value = "09:00";
-    $("fDay").value = String(selected);
-    $("sheet").className = "sheet show";
-  }
-
-  function closeSheet() {
-    $("sheet").className = "sheet";
-  }
-
-  $("days").onclick = function (e) {
-    var b = e.target;
-    while (b && b !== this && !b.getAttribute("data-day")) b = b.parentNode;
-    if (!b || !b.getAttribute) return;
-    var day = b.getAttribute("data-day");
-    if (day == null) return;
-    selected = Number(day);
-    render();
+  function findItem(id){ for(var i=0;i<items.length;i++) if(items[i].id===id) return items[i]; return null; }
+  $("days").onclick=function(e){
+    var b=e.target; while(b && b!==this && !b.getAttribute("data-day")) b=b.parentNode;
+    if(!b||!b.getAttribute||b.getAttribute("data-day")==null) return;
+    selected=Number(b.getAttribute("data-day")); render();
   };
-
-  $("list").onclick = function (e) {
-    var b = e.target;
-    while (b && b !== this && !b.getAttribute("data-id")) b = b.parentNode;
-    if (!b || !b.getAttribute) return;
-    var id = b.getAttribute("data-id");
-    if (!id) return;
-    items = items.filter(function (x) { return x.id !== id; });
-    persist(items);
-    render();
+  $("list").onclick=function(e){
+    var skipBtn=e.target.closest("[data-skip]");
+    var delBtn=e.target.closest("[data-del]");
+    if(skipBtn){
+      var item=findItem(skipBtn.getAttribute("data-skip"));
+      if(!item) return;
+      var day=iso(dateFor(selected));
+      item.skips = item.skips || [];
+      if(item.skips.indexOf(day)===-1) item.skips.push(day);
+      persist(); render(); return;
+    }
+    if(delBtn){
+      var id=delBtn.getAttribute("data-del");
+      items=items.filter(function(x){ return x.id!==id; }); persist(); render();
+    }
   };
-
-  $("addBtn").onclick = openSheet;
-  $("talkBtn").onclick = speak;
-  $("sheet").onclick = function (e) { if (e.target.id === "sheet") closeSheet(); };
-
-  $("form").onsubmit = function (e) {
-    if (e && e.preventDefault) e.preventDefault();
-    var title = $("fTitle").value.replace(/^\s+|\s+$/g, "");
-    if (!title) return false;
-    items.push({
-      id: String(new Date().getTime()),
-      title: title,
-      day: Number($("fDay").value),
-      time: $("fTime").value || "09:00",
-      note: $("fNote").value.replace(/^\s+|\s+$/g, "")
-    });
-    selected = Number($("fDay").value);
-    persist(items);
-    closeSheet();
-    render();
-    return false;
+  $("types").onclick=function(e){ var b=e.target.closest("[data-type]"); if(!b) return; pickType=b.getAttribute("data-type"); mark("types","data-type",pickType); };
+  $("reps").onclick=function(e){ var b=e.target.closest("[data-rep]"); if(!b) return; pickRep=b.getAttribute("data-rep"); mark("reps","data-rep",pickRep); };
+  $("addBtn").onclick=function(){
+    fillDays(); $("form").reset(); $("fTime").value="09:30"; $("fDay").value=String(selected);
+    pickType="riunione"; pickRep="none"; mark("types","data-type",pickType); mark("reps","data-rep",pickRep);
+    $("sheet").className="sheet show";
   };
-
-  try {
-    render();
-  } catch (err) {
-    $("speech").innerHTML = "C’è un problema: " + escapeHtml(err && err.message ? err.message : String(err));
-  }
+  $("talkBtn").onclick=speak;
+  $("sheet").onclick=function(e){ if(e.target.id==="sheet") $("sheet").className="sheet"; };
+  $("form").onsubmit=function(e){
+    if(e&&e.preventDefault) e.preventDefault();
+    var title=$("fTitle").value.replace(/^\s+|\s+$/g,""); if(!title) return false;
+    var day=Number($("fDay").value);
+    items.push({ id:String(Date.now()), title:title, time:$("fTime").value||"09:30", type:pickType, rep:pickRep, weekday:day, date:iso(dateFor(day)), note:$("fNote").value.replace(/^\s+|\s+$/g,""), skips:[] });
+    selected=day; persist(); $("sheet").className="sheet"; render(); return false;
+  };
+  try { render(); } catch(err){ $("speech").textContent="Errore: "+err.message; }
 })();
 </script>
 </body>
