@@ -6,12 +6,12 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Nino Lavoro">
-  <meta name="theme-color" content="#143056">
+  <meta name="theme-color" content="#3a6ad9">
   <meta name="mobile-web-app-capable" content="yes">
   <title>Nino Lavoro</title>
   <style>
     :root {
-      --navy:#143056; --blue:#2b6fe0; --ink:#12203a; --muted:#5b6b86; --bad:#c43c3c;
+      --navy:#2a4ea8; --blue:#4a7dff; --ink:#1b2744; --muted:#667694; --bad:#e25563;
       --safe-t: env(safe-area-inset-top, 0px);
       --safe-b: env(safe-area-inset-bottom, 0px);
     }
@@ -19,28 +19,33 @@
     html, body { margin:0; height:100%; }
     body {
       font-family:-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-      color:var(--ink); background:#d9e4f4; overflow:hidden;
+      color:var(--ink); background:#e7eefc; overflow:hidden;
     }
     .app {
       max-width:480px; margin:0 auto; height:100%;
       display:flex; flex-direction:column;
-      background: linear-gradient(#17345f 0 210px, #d9e4f4 210px);
+      background: linear-gradient(#8ec5ff 0 92px, #cfe4ff 92px 220px, #e7eefc 220px);
       padding: calc(10px + var(--safe-t)) 12px calc(10px + var(--safe-b));
     }
-    header { display:flex; justify-content:space-between; align-items:center; color:#fff; }
+    header { display:flex; justify-content:space-between; align-items:center; }
     .brand { font-weight:800; font-size:17px; letter-spacing:-.03em; }
-    .brand span { opacity:.72; font-weight:700; }
-    .week { font-size:12px; opacity:.8; font-weight:600; }
-    .hero { display:flex; align-items:flex-end; gap:6px; margin:2px 0 8px; min-height:188px; }
-    .nino-wrap { width:168px; flex:0 0 168px; }
-    .nino { width:168px; height:188px; display:block; }
+    .brand span { color:#2a4ea8; }
+    .navw { display:flex; align-items:center; gap:6px; }
+    .navw button {
+      width:30px; height:30px; border-radius:10px; background:#fff; color:var(--navy);
+      font-weight:800; box-shadow:0 4px 10px rgba(42,78,168,.12);
+    }
+    .week { font-size:12px; font-weight:700; color:#2a4ea8; min-width:92px; text-align:center; }
+    .hero { display:flex; align-items:flex-end; gap:4px; margin:2px 0 8px; min-height:200px; }
+    .nino-wrap { width:176px; flex:0 0 176px; }
+    .nino { width:176px; height:204px; display:block; }
     .bubble {
-      flex:1; background:#fff; border-radius:18px 18px 18px 8px;
-      padding:12px 13px; min-height:96px; margin-bottom:18px;
-      box-shadow:0 10px 24px rgba(0,0,0,.12); position:relative;
+      flex:1; background:#fff; border-radius:20px 20px 20px 8px;
+      padding:12px 13px; min-height:100px; margin-bottom:22px;
+      box-shadow:0 10px 24px rgba(42,78,168,.14); position:relative;
     }
     .bubble:before {
-      content:""; position:absolute; left:-8px; bottom:28px;
+      content:""; position:absolute; left:-8px; bottom:34px;
       border:8px solid transparent; border-right-color:#fff; border-left:0;
     }
     .who { font-size:11px; font-weight:800; color:var(--blue); text-transform:uppercase; letter-spacing:.04em; }
@@ -57,6 +62,7 @@
     .days { display:grid; grid-template-columns:repeat(7,1fr); gap:5px; margin-bottom:8px; }
     .day { background:#fff; border-radius:13px; padding:7px 0 6px; text-align:center; }
     .day.on { background:var(--navy); color:#fff; }
+    .day.today:not(.on) { outline:2px solid #8eb0ff; }
     .day .dn { font-size:10px; font-weight:800; opacity:.65; }
     .day .dd { font-size:14px; font-weight:800; }
     .day .dot { width:5px; height:5px; border-radius:50%; margin:4px auto 0; background:transparent; }
@@ -84,9 +90,7 @@
     .t-task { background:#f1e9ff; color:#6b3cc3; }
     .rep { font-size:10px; font-weight:800; color:var(--blue); }
     .acts { float:right; display:flex; gap:4px; margin:-2px 0 0; }
-    .del, .skip {
-      height:28px; border-radius:9px; background:#fff; font-size:11px; font-weight:800; padding:0 8px;
-    }
+    .del, .skip { height:28px; border-radius:9px; background:#fff; font-size:11px; font-weight:800; padding:0 8px; }
     .del { color:var(--bad); width:28px; padding:0; font-size:16px; }
     .skip { color:var(--navy); }
     .nowbar { grid-column:1 / -1; display:flex; align-items:center; gap:8px; color:#c43c3c; font-size:11px; font-weight:800; margin:2px 0 8px; }
@@ -107,55 +111,72 @@
     .chip.on { background:var(--navy); color:#fff; }
     .save { width:100%; margin-top:14px; }
     .bob { animation:bob 2.8s ease-in-out infinite; transform-origin:50% 100%; }
-    @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
-    .blink { animation:blink 4.6s infinite; }
-    @keyframes blink { 0%,92%,100%{transform:scaleY(1)} 94%{transform:scaleY(.08)} }
-    .talking .mouth { animation:talk .26s infinite alternate; }
-    @keyframes talk { from{transform:scaleY(.45)} to{transform:scaleY(1.2)} }
+    @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+    .blink { animation:blink 4.2s infinite; }
+    @keyframes blink { 0%,90%,100%{transform:scaleY(1)} 93%{transform:scaleY(.08)} }
+    .talking .mouth { animation:talk .24s infinite alternate; }
+    @keyframes talk { from{transform:scaleY(.4)} to{transform:scaleY(1.25)} }
   </style>
 </head>
 <body>
   <div class="app">
     <header>
       <div class="brand">Nino <span>Lavoro</span></div>
-      <div class="week" id="weekLabel"></div>
+      <div class="navw">
+        <button type="button" id="prevW" aria-label="Settimana precedente">‹</button>
+        <div class="week" id="weekLabel"></div>
+        <button type="button" id="nextW" aria-label="Settimana successiva">›</button>
+      </div>
     </header>
     <section class="hero">
       <div class="nino-wrap bob" id="ninoWrap">
-        <svg class="nino" viewBox="0 0 200 230" aria-hidden="true">
-          <ellipse cx="100" cy="222" rx="54" ry="7" fill="#0b1b33" opacity=".22"/>
-          <rect x="72" y="188" width="18" height="26" rx="6" fill="#1a2a44"/>
-          <rect x="110" y="188" width="18" height="26" rx="6" fill="#1a2a44"/>
-          <rect x="68" y="208" width="26" height="10" rx="4" fill="#0e1726"/>
-          <rect x="106" y="208" width="26" height="10" rx="4" fill="#0e1726"/>
-          <path d="M58 128 C58 118 70 112 100 112 C130 112 142 118 142 128 L148 188 C148 196 140 200 100 200 C60 200 52 196 52 188 Z" fill="#1c3358"/>
-          <path d="M86 120 L100 168 L114 120 Z" fill="#f4f7fb"/>
-          <path d="M100 124 L94 148 L100 144 L106 148 Z" fill="#c43c3c"/>
-          <path d="M86 120 L100 132 L114 120" fill="none" stroke="#d7dee8" stroke-width="2"/>
-          <rect x="42" y="128" width="20" height="52" rx="10" fill="#1c3358"/>
-          <rect x="138" y="128" width="20" height="52" rx="10" fill="#1c3358"/>
-          <circle cx="52" cy="182" r="9" fill="#2b6fe0"/>
-          <circle cx="148" cy="182" r="9" fill="#2b6fe0"/>
-          <circle cx="100" cy="78" r="50" fill="#2b6fe0"/>
-          <ellipse cx="100" cy="96" rx="28" ry="16" fill="#fff"/>
-          <path d="M62 60 C78 38 122 38 138 60" fill="none" stroke="#16325c" stroke-width="7" stroke-linecap="round"/>
-          <rect x="68" y="68" width="26" height="18" rx="6" fill="none" stroke="#0e1726" stroke-width="3"/>
-          <rect x="106" y="68" width="26" height="18" rx="6" fill="none" stroke="#0e1726" stroke-width="3"/>
-          <path d="M94 77 H106" stroke="#0e1726" stroke-width="3"/>
-          <g class="blink" style="transform-origin:81px 77px"><circle cx="81" cy="77" r="5.2" fill="#1a2438"/><circle cx="79" cy="75" r="1.6" fill="#fff"/></g>
-          <g class="blink" style="transform-origin:119px 77px"><circle cx="119" cy="77" r="5.2" fill="#1a2438"/><circle cx="117" cy="75" r="1.6" fill="#fff"/></g>
-          <ellipse cx="100" cy="92" rx="6.5" ry="5" fill="#e85b5b"/>
-          <ellipse class="mouth" cx="100" cy="108" rx="8" ry="5" fill="#1a2438"/>
-          <rect x="118" y="142" width="10" height="8" rx="1" fill="#ffd15a"/>
+        <svg class="nino" viewBox="0 0 220 255" aria-hidden="true">
+          <ellipse cx="110" cy="246" rx="52" ry="7" fill="#7aa0d8" opacity=".35"/>
+          <rect x="86" y="208" width="16" height="28" rx="8" fill="#2a3d66"/>
+          <rect x="118" y="208" width="16" height="28" rx="8" fill="#2a3d66"/>
+          <ellipse cx="94" cy="236" rx="13" ry="6" fill="#1b2744"/>
+          <ellipse cx="126" cy="236" rx="13" ry="6" fill="#1b2744"/>
+          <path d="M70 148 C70 132 86 126 110 126 C134 126 150 132 150 148 L156 208 C156 218 140 224 110 224 C80 224 64 218 64 208 Z" fill="#3558a8"/>
+          <path d="M96 138 L110 188 L124 138 Z" fill="#fff"/>
+          <path d="M110 142 L104 166 L110 162 L116 166 Z" fill="#ff5a6a"/>
+          <rect x="52" y="148" width="20" height="46" rx="11" fill="#3558a8"/>
+          <rect x="148" y="148" width="20" height="46" rx="11" fill="#3558a8"/>
+          <circle cx="62" cy="196" r="10" fill="#6ea2ff"/>
+          <circle cx="158" cy="196" r="10" fill="#6ea2ff"/>
+          <ellipse cx="58" cy="86" rx="18" ry="22" fill="#4a7dff"/>
+          <ellipse cx="162" cy="86" rx="18" ry="22" fill="#4a7dff"/>
+          <ellipse cx="58" cy="90" rx="10" ry="13" fill="#fff6c8"/>
+          <ellipse cx="162" cy="90" rx="10" ry="13" fill="#fff6c8"/>
+          <circle cx="110" cy="96" r="62" fill="#4a7dff"/>
+          <ellipse cx="110" cy="118" rx="36" ry="24" fill="#fff"/>
+          <circle cx="78" cy="92" r="22" fill="#fff"/>
+          <circle cx="142" cy="92" r="22" fill="#fff"/>
+          <g class="blink" style="transform-origin:78px 94px">
+            <circle cx="78" cy="94" r="12" fill="#1b2744"/>
+            <circle cx="78" cy="94" r="6" fill="#3aa0ff"/>
+            <circle cx="73" cy="88" r="5" fill="#fff"/>
+            <circle cx="82" cy="97" r="2" fill="#fff"/>
+          </g>
+          <g class="blink" style="transform-origin:142px 94px">
+            <circle cx="142" cy="94" r="12" fill="#1b2744"/>
+            <circle cx="142" cy="94" r="6" fill="#3aa0ff"/>
+            <circle cx="137" cy="88" r="5" fill="#fff"/>
+            <circle cx="146" cy="97" r="2" fill="#fff"/>
+          </g>
+          <ellipse cx="68" cy="112" rx="8" ry="4" fill="#ff9aa8" opacity=".85"/>
+          <ellipse cx="152" cy="112" rx="8" ry="4" fill="#ff9aa8" opacity=".85"/>
+          <ellipse cx="110" cy="116" rx="7" ry="5" fill="#ff7a88"/>
+          <path d="M102 128 Q110 136 118 128" fill="none" stroke="#1b2744" stroke-width="3" stroke-linecap="round" class="mouth"/>
+          <circle cx="110" cy="176" r="6" fill="#ffd15a"/>
         </svg>
       </div>
       <div class="bubble">
-        <div class="who">Nino · in giacca</div>
-        <div class="say" id="speech">Preparo la timeline…</div>
+        <div class="who">Nino</div>
+        <div class="say" id="speech">Guardo il calendario…</div>
       </div>
     </section>
     <div class="stats">
-      <div class="stat"><b id="sToday">0</b><span>OGGI</span></div>
+      <div class="stat"><b id="sToday">0</b><span id="sTodayL">GIORNO</span></div>
       <div class="stat"><b id="sWeek">0</b><span>SETTIMANA</span></div>
       <div class="stat"><b id="sDead">0</b><span>SCADENZE</span></div>
     </div>
@@ -201,26 +222,33 @@
   var DAYS_LONG = ["lunedì","martedì","mercoledì","giovedì","venerdì","sabato","domenica"];
   var LABELS = { riunione:"Riunione", call:"Call", scadenza:"Scadenza", task:"Task" };
   var REPS = { none:"una tantum", weekly:"ogni settimana", weekdays:"lun-ven", daily:"tutti i giorni" };
-  var KEY = "nino-lavoro-v2";
+  var KEY = "nino-lavoro-v3";
   function $(id){ return document.getElementById(id); }
   function pad(n){ return (n<10?"0":"")+n; }
   function todayIndex(){ var d=new Date().getDay(); return d===0?6:d-1; }
-  function monday(){ var d=new Date(); var day=d.getDay(); d.setDate(d.getDate()+(day===0?-6:1-day)); d.setHours(12,0,0,0); return d; }
-  function dateFor(i){ var m=monday(); m.setDate(m.getDate()+i); return m; }
+  function thisMonday(){
+    var d=new Date(); var day=d.getDay();
+    d.setDate(d.getDate()+(day===0?-6:1-day)); d.setHours(12,0,0,0); return d;
+  }
+  function mondayOf(){
+    var d=thisMonday(); d.setDate(d.getDate()+weekOff*7); return d;
+  }
+  function dateFor(i){ var m=mondayOf(); m.setDate(m.getDate()+i); return m; }
   function iso(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+  function todayIso(){ var d=new Date(); return iso(d); }
   function load(){ try{ var x=JSON.parse(localStorage.getItem(KEY)||"[]"); return x instanceof Array?x:[]; }catch(e){ return []; } }
   function persist(){ try{ localStorage.setItem(KEY, JSON.stringify(items)); }catch(e){} }
   function esc(s){ return String(s).replace(/[&<>"']/g, function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];}); }
   function nowHHMM(){ var d=new Date(); return pad(d.getHours())+":"+pad(d.getMinutes()); }
   function skipped(item, dateStr){
-    var s = item.skips || [];
-    for(var i=0;i<s.length;i++) if(s[i]===dateStr) return true;
-    return false;
+    var s=item.skips||[]; for(var i=0;i<s.length;i++) if(s[i]===dateStr) return true; return false;
   }
+  var weekOff = 0;
   var selected = todayIndex();
   var items = load();
   var pickType = "riunione";
   var pickRep = "none";
+
   function happensOn(item, dayIdx, dateStr){
     if(skipped(item, dateStr)) return false;
     var r = item.rep || "none";
@@ -238,51 +266,61 @@
   function weekDead(){
     var n=0; for(var i=0;i<7;i++) ofDay(i).forEach(function(x){ if(x.type==="scadenza") n++; }); return n;
   }
+  function isCurrentWeek(){ return weekOff===0; }
+  function viewingToday(){ return isCurrentWeek() && selected===todayIndex(); }
   function phrase(){
-    var today=todayIndex(), rows=ofDay(selected), todayRows=ofDay(today);
-    var weekN=uniqueWeekCount(), dead=weekDead(), isToday=selected===today;
-    if(!items.length) return { main:"Nessun impegno in archivio. Carichiamo la prima riunione?", sub:"Puoi farla ripetere, o saltare solo un giorno." };
-    if(isToday && !todayRows.length) return { main:"Oggi l’agenda è libera.", sub: weekN+" cose in settimana"+(dead?(", "+dead+" scadenze."):".") };
-    if(!rows.length) return { main:"Niente in timeline per "+DAYS_LONG[selected]+".", sub: todayRows.length?("Oggi invece hai "+todayRows.length+" impegni."):("In settimana risultano "+weekN+" slot.") };
-    var first=rows[0];
-    var label=isToday?"Oggi":(DAYS_LONG[selected].charAt(0).toUpperCase()+DAYS_LONG[selected].slice(1));
-    if(rows.length===1) return { main: label+" in agenda alle "+first.time+": "+first.title+".", sub: (LABELS[first.type]||"")+(first.rep && first.rep!=="none"?" · "+REPS[first.rep]:"") };
-    return { main: label+" hai "+rows.length+" impegni, dal "+rows[0].time+" al "+rows[rows.length-1].time+".", sub: rows.map(function(x){ return x.time+" "+x.title; }).join(", ")+"." };
+    var rows=ofDay(selected), weekN=uniqueWeekCount(), dead=weekDead();
+    var dayName=DAYS_LONG[selected];
+    var when = viewingToday() ? "Oggi" : (DAYS_LONG[selected].charAt(0).toUpperCase()+dayName.slice(1));
+    if(weekOff===1) when = "Il prossimo "+dayName;
+    if(weekOff>1) when = dayName+" tra "+weekOff+" settimane";
+    if(weekOff===-1) when = "Il "+dayName+" scorso";
+    if(weekOff<-1) when = dayName+" di "+(-weekOff)+" settimane fa";
+    if(!items.length) return { main:"Nessun impegno in archivio. Ne mettiamo uno anche tra due settimane?", sub:"Usa le frecce in alto per cambiare settimana." };
+    if(!rows.length) return { main: when+" non hai nulla in agenda.", sub: weekN? (weekN+" impegni in questa settimana."):"Questa settimana è libera." };
+    if(rows.length===1) return { main: when+" alle "+rows[0].time+": "+rows[0].title+".", sub: (LABELS[rows[0].type]||"")+(rows[0].rep && rows[0].rep!=="none"?" · "+REPS[rows[0].rep]:"") };
+    return { main: when+" hai "+rows.length+" impegni, dal "+rows[0].time+" al "+rows[rows.length-1].time+".", sub: rows.map(function(x){ return x.time+" "+x.title; }).join(", ")+"." };
   }
   function nearestId(rows){
-    if(selected!==todayIndex() || !rows.length) return null;
+    if(!viewingToday() || !rows.length) return null;
     var now=nowHHMM(), next=null;
     for(var i=0;i<rows.length;i++) if(rows[i].time>=now){ next=rows[i].id; break; }
     return next || rows[rows.length-1].id;
   }
-  function render(){
+  function fmtRange(){
     var a=dateFor(0), b=dateFor(6);
-    $("weekLabel").textContent = a.getDate()+"/"+(a.getMonth()+1)+" – "+b.getDate()+"/"+(b.getMonth()+1);
-    $("sToday").textContent = ofDay(todayIndex()).length;
+    var label = a.getDate()+"/"+(a.getMonth()+1)+" – "+b.getDate()+"/"+(b.getMonth()+1);
+    if(weekOff===0) label = "questa · "+label;
+    return label;
+  }
+  function render(){
+    $("weekLabel").textContent = fmtRange();
+    $("sToday").textContent = ofDay(selected).length;
+    $("sTodayL").textContent = viewingToday() ? "OGGI" : DAYS[selected].toUpperCase();
     $("sWeek").textContent = uniqueWeekCount();
     $("sDead").textContent = weekDead();
     var p=phrase();
     $("speech").innerHTML = p.main+(p.sub?"<small>"+esc(p.sub)+"</small>":"");
-    var days="";
+    var days="", curIso=todayIso();
     for(var i=0;i<7;i++){
-      var d=dateFor(i);
-      days += '<button type="button" class="day'+(i===selected?" on":"")+(ofDay(i).length?" has":"")+'" data-day="'+i+'"><div class="dn">'+DAYS[i]+'</div><div class="dd">'+d.getDate()+'</div><div class="dot"></div></button>';
+      var d=dateFor(i), isToday=iso(d)===curIso;
+      days += '<button type="button" class="day'+(i===selected?" on":"")+(ofDay(i).length?" has":"")+(isToday?" today":"")+'" data-day="'+i+'"><div class="dn">'+DAYS[i]+'</div><div class="dd">'+d.getDate()+'</div><div class="dot"></div></button>';
     }
     $("days").innerHTML=days;
     var rows=ofDay(selected);
-    if(!rows.length){ $("list").innerHTML='<div class="empty">Timeline vuota.<br>Nino aspetta il primo impegno.</div>'; return; }
+    if(!rows.length){ $("list").innerHTML='<div class="empty">Nessun impegno in questo giorno.<br>Tocca + Impegno per questa settimana o per quelle dopo.</div>'; return; }
     var focus=nearestId(rows), now=nowHHMM(), html='<div class="tl">', shownNow=false;
     for(var j=0;j<rows.length;j++){
       var x=rows[j];
-      if(selected===todayIndex() && !shownNow && x.time>now){ html += '<div class="nowbar">adesso<i></i>'+now+'</div>'; shownNow=true; }
+      if(viewingToday() && !shownNow && x.time>now){ html += '<div class="nowbar">adesso<i></i>'+now+'</div>'; shownNow=true; }
       var recurring = x.rep && x.rep!=="none";
       html += '<div class="row'+(focus===x.id?" now":"")+'"><div class="hh">'+esc(x.time)+'</div><div class="rail"><div class="dotline '+esc(x.type)+'"></div></div><div class="card">'+
-        '<div class="acts">'+(recurring?'<button type="button" class="skip" data-skip="'+esc(x.id)+'">Salta oggi</button>':'')+
+        '<div class="acts">'+(recurring?'<button type="button" class="skip" data-skip="'+esc(x.id)+'">Salta giorno</button>':'')+
         '<button type="button" class="del" data-del="'+esc(x.id)+'">×</button></div>'+
         '<div class="title">'+esc(x.title)+'</div><div class="meta"><span class="tag t-'+esc(x.type)+'">'+esc(LABELS[x.type]||x.type)+'</span>'+
         (recurring?'<span class="rep">'+esc(REPS[x.rep])+'</span> ':'')+esc(x.note||"")+'</div></div></div>';
     }
-    if(selected===todayIndex() && !shownNow) html += '<div class="nowbar">adesso<i></i>'+now+'</div>';
+    if(viewingToday() && !shownNow) html += '<div class="nowbar">adesso<i></i>'+now+'</div>';
     $("list").innerHTML = html+"</div>";
   }
   function speak(){
@@ -291,12 +329,16 @@
     if(!window.speechSynthesis){ setTimeout(function(){ wrap.className="nino-wrap bob"; },1600); return; }
     speechSynthesis.cancel();
     var u=new SpeechSynthesisUtterance((p.main+" "+(p.sub||"")).trim());
-    u.lang="it-IT"; u.rate=1.02; u.pitch=1.1;
+    u.lang="it-IT"; u.rate=1.02; u.pitch=1.18;
     u.onend=function(){ wrap.className="nino-wrap bob"; };
     speechSynthesis.speak(u);
   }
   function fillDays(){
-    var html=""; for(var i=0;i<7;i++) html += '<option value="'+i+'">'+DAYS[i]+" "+dateFor(i).getDate()+'</option>';
+    var html="";
+    for(var i=0;i<7;i++){
+      var d=dateFor(i);
+      html += '<option value="'+i+'">'+DAYS[i]+" "+d.getDate()+"/"+(d.getMonth()+1)+'</option>';
+    }
     $("fDay").innerHTML=html; $("fDay").value=String(selected);
   }
   function mark(group, attr, value){
@@ -304,6 +346,10 @@
     for(var i=0;i<all.length;i++) all[i].className="chip"+(all[i].getAttribute(attr)===value?" on":"");
   }
   function findItem(id){ for(var i=0;i<items.length;i++) if(items[i].id===id) return items[i]; return null; }
+
+  $("prevW").onclick=function(){ weekOff--; render(); };
+  $("nextW").onclick=function(){ weekOff++; render(); };
+  $("weekLabel").onclick=function(){ weekOff=0; selected=todayIndex(); render(); };
   $("days").onclick=function(e){
     var b=e.target; while(b && b!==this && !b.getAttribute("data-day")) b=b.parentNode;
     if(!b||!b.getAttribute||b.getAttribute("data-day")==null) return;
