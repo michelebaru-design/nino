@@ -88,12 +88,17 @@
     .now .card { outline:2px solid var(--blue); background:#eef4ff; }
     .card.rip { background:#fff4c4; }
     .card.urg { background:#ffd6d6; }
+    .card.done { background:#c9f2d4; }
     .now .card.rip { outline-color:#e0b12d; background:#ffe99a; }
     .now .card.urg { outline-color:#d64545; background:#ffc4c4; }
+    .now .card.done { outline-color:#1f9d6a; background:#b5ebc6; }
     .dotline.rip { background:#e0b12d; border-color:#ffe9a0; }
     .dotline.urg { background:#d64545; border-color:#ffb3b3; }
+    .dotline.done { background:#1f9d6a; border-color:#b5ebc6; }
     .t-rip { background:#ffe9a0; color:#8a6a00; }
     .t-urg { background:#ffb3b3; color:#9b1c1c; }
+    .t-done { background:#b5ebc6; color:#0f7a4a; }
+    .card.done .title { text-decoration:line-through; opacity:.75; }
     .title { font-weight:750; font-size:15px; padding-right:78px; }
     .meta { color:var(--muted); font-size:12px; margin-top:3px; }
     .tag { display:inline-block; font-size:10px; font-weight:800; padding:2px 6px; border-radius:999px; margin-right:4px; }
@@ -280,6 +285,15 @@
   function skipped(item, dateStr){
     var s=item.skips||[]; for(var i=0;i<s.length;i++) if(s[i]===dateStr) return true; return false;
   }
+  function isDone(item, dateStr){
+    var s=item.doneDates||[]; for(var i=0;i<s.length;i++) if(s[i]===dateStr) return true; return false;
+  }
+  function toggleDate(arr, dateStr){
+    arr = arr || [];
+    var i=arr.indexOf(dateStr);
+    if(i===-1) arr.push(dateStr); else arr.splice(i,1);
+    return arr;
+  }
   var weekOff = 0;
   var selected = todayIndex();
   var items = load();
@@ -359,12 +373,14 @@
       if(viewingToday() && !shownNow && x.time>now){ html += '<div class="nowbar">adesso<i></i>'+now+'</div>'; shownNow=true; }
       var recurring = x.rep && x.rep!=="none";
       var urg = !!x.urgente || x.type==="scadenza";
-      var tone = urg ? "urg" : (recurring ? "rip" : "");
+      var done = isDone(x, iso(dateFor(selected)));
+      var tone = done ? "done" : (urg ? "urg" : (recurring ? "rip" : ""));
       html += '<div class="row'+(focus===x.id?" now":"")+'"><div class="hh">'+esc(x.time)+'</div><div class="rail"><div class="dotline '+esc(x.type)+(tone?" "+tone:"")+'"></div></div><div class="card'+(tone?" "+tone:"")+'">'+
-        '<div class="acts"><button type="button" class="skip edit" data-edit="'+esc(x.id)+'">Modifica</button>'+(recurring?'<button type="button" class="skip" data-skip="'+esc(x.id)+'">Salta</button>':'')+
+        '<div class="acts"><button type="button" class="skip edit" data-done="'+esc(x.id)+'">'+(done?"Annulla":"Fatto")+'</button><button type="button" class="skip edit" data-edit="'+esc(x.id)+'">Modifica</button>'+(recurring?'<button type="button" class="skip" data-skip="'+esc(x.id)+'">Salta</button>':'')+
         '<button type="button" class="del" data-del="'+esc(x.id)+'">×</button></div>'+
         '<div class="title">'+esc(x.title)+'</div><div class="meta"><span class="tag t-'+esc(x.type)+'">'+esc(LABELS[x.type]||x.type)+'</span>'+
-        (urg?'<span class="tag t-urg">Urgente</span>':'')+
+        (done?'<span class="tag t-done">Fatto</span>':'')+
+        (urg && !done?'<span class="tag t-urg">Urgente</span>':'')+
         (recurring?'<span class="tag t-rip">'+esc(REPS[x.rep])+'</span> ':'')+esc(x.note||"")+'</div></div></div>';
     }
     if(viewingToday() && !shownNow) html += '<div class="nowbar">adesso<i></i>'+now+'</div>';
@@ -403,9 +419,16 @@
     selected=Number(b.getAttribute("data-day")); render();
   };
   $("list").onclick=function(e){
+    var doneBtn=e.target.closest("[data-done]");
     var editBtn=e.target.closest("[data-edit]");
     var skipBtn=e.target.closest("[data-skip]");
     var delBtn=e.target.closest("[data-del]");
+    if(doneBtn){
+      var item=findItem(doneBtn.getAttribute("data-done"));
+      if(!item) return;
+      item.doneDates = toggleDate(item.doneDates, iso(dateFor(selected)));
+      persist(); render(); return;
+    }
     if(editBtn){
       var item=findItem(editBtn.getAttribute("data-edit"));
       if(item) openForm(item);
@@ -478,7 +501,7 @@
       }
       editId=null;
     } else {
-      payload.id=String(Date.now()); payload.skips=[]; items.push(payload);
+      payload.id=String(Date.now()); payload.skips=[]; payload.doneDates=[]; items.push(payload);
     }
     selected=day; persist(); $("sheet").className="sheet"; render(); return false;
   };
