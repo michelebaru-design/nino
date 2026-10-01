@@ -27,6 +27,11 @@
       background: linear-gradient(#9ad0ff 0 80px, #ffe9b8 80px 250px, #e7eefc 250px);
       padding: calc(10px + var(--safe-t)) 12px calc(10px + var(--safe-b));
     }
+    .weekgrid { display:block; }
+    .col { display:none; }
+    .col.on { display:block; }
+    .colhead { display:none; }
+    .pc-hint { display:none; }
     header { display:flex; justify-content:space-between; align-items:center; }
     .brand { font-weight:800; font-size:17px; letter-spacing:-.03em; }
     .brand span { color:#2a4ea8; }
@@ -136,6 +141,42 @@
     @keyframes blink { 0%,90%,100%{transform:scaleY(1)} 93%{transform:scaleY(.08)} }
     .talking .mouth { animation:talk .24s infinite alternate; }
     @keyframes talk { from{transform:scaleY(.4)} to{transform:scaleY(1.25)} }
+
+    @media (min-width: 980px) {
+      body { overflow:auto; background:#dce8fb; }
+      .app {
+        max-width:1360px; height:100%;
+        background: linear-gradient(#9ad0ff 0 56px, #e7eefc 56px);
+        padding: 14px 16px 16px;
+      }
+      header { margin-bottom: 2px; }
+      .hero { min-height:auto; align-items:center; margin:0 0 8px; }
+      .nino-wrap { width:120px; flex:0 0 120px; }
+      .nino { width:120px; height:134px; }
+      .bubble { min-height:72px; margin-bottom:0; }
+      .stats { max-width:420px; }
+      .toprow { display:grid; grid-template-columns: 1fr 280px; gap:10px; align-items:end; }
+      .days { display:none; }
+      .board { padding:10px; }
+      .weekgrid {
+        display:grid; grid-template-columns:repeat(7, minmax(0,1fr));
+        gap:8px; min-height:100%;
+      }
+      .col { display:flex; flex-direction:column; background:#f4f7fd; border-radius:16px; min-height:420px; padding:8px 7px 10px; }
+      .col.on { outline:2px solid var(--blue); background:#eef4ff; }
+      .col.today { outline:2px solid #8eb0ff; }
+      .colhead { display:block; text-align:center; margin-bottom:8px; cursor:pointer; }
+      .colhead .dn { font-size:11px; font-weight:800; color:var(--muted); }
+      .colhead .dd { font-size:18px; font-weight:800; }
+      .col .row { grid-template-columns:42px 1fr; gap:6px; min-height:auto; }
+      .col .rail { display:none; }
+      .col .card { margin-bottom:6px; padding:8px; }
+      .col .title { font-size:13px; padding-right:0; }
+      .col .acts { float:none; display:flex; flex-wrap:wrap; margin:0 0 4px; }
+      .col .acts button { height:24px; font-size:10px; }
+      .col .del { width:24px; }
+      .pc-hint { display:block; font-size:12px; color:var(--muted); font-weight:600; margin:0 0 6px; }
+    }
   </style>
 </head>
 <body>
@@ -365,26 +406,45 @@
       days += '<button type="button" class="day'+(i===selected?" on":"")+(ofDay(i).length?" has":"")+(isToday?" today":"")+'" data-day="'+i+'"><div class="dn">'+DAYS[i]+'</div><div class="dd">'+d.getDate()+'</div><div class="dot"></div></button>';
     }
     $("days").innerHTML=days;
-    var rows=ofDay(selected);
-    if(!rows.length){ $("list").innerHTML='<div class="empty">Nessun impegno in questo giorno.<br>Tocca + Impegno per questa settimana o per quelle dopo.</div>'; return; }
-    var focus=nearestId(rows), now=nowHHMM(), html='<div class="tl">', shownNow=false;
+    $("list").innerHTML = buildWeekBoard();
+  }
+  function cardHtml(x, dayIdx){
+    var dateStr = iso(dateFor(dayIdx));
+    var recurring = x.rep && x.rep!=="none";
+    var urg = !!x.urgente || x.type==="scadenza";
+    var done = isDone(x, dateStr);
+    var tone = done ? "done" : (urg ? "urg" : (recurring ? "rip" : ""));
+    var isTodayCol = iso(dateFor(dayIdx))===todayIso();
+    var focus = isTodayCol ? nearestId(ofDay(dayIdx)) : null;
+    return '<div class="row'+(focus===x.id?" now":"")+'"><div class="hh">'+esc(x.time)+'</div><div class="rail"><div class="dotline '+esc(x.type)+(tone?" "+tone:"")+'"></div></div><div class="card'+(tone?" "+tone:"")+'">'+
+      '<div class="acts"><button type="button" class="skip edit" data-day="'+dayIdx+'" data-done="'+esc(x.id)+'">'+(done?"Annulla":"Fatto")+'</button><button type="button" class="skip edit" data-day="'+dayIdx+'" data-edit="'+esc(x.id)+'">Modifica</button>'+(recurring?'<button type="button" class="skip" data-day="'+dayIdx+'" data-skip="'+esc(x.id)+'">Salta</button>':'')+
+      '<button type="button" class="del" data-del="'+esc(x.id)+'">×</button></div>'+
+      '<div class="title">'+esc(x.title)+'</div><div class="meta"><span class="tag t-'+esc(x.type)+'">'+esc(LABELS[x.type]||x.type)+'</span>'+
+      (done?'<span class="tag t-done">Fatto</span>':'')+
+      (urg && !done?'<span class="tag t-urg">Urgente</span>':'')+
+      (recurring?'<span class="tag t-rip">'+esc(REPS[x.rep])+'</span> ':'')+esc(x.note||"")+'</div></div></div>';
+  }
+  function dayTimeline(dayIdx){
+    var rows=ofDay(dayIdx);
+    if(!rows.length) return '<div class="empty">Libero</div>';
+    var html='<div class="tl">', now=nowHHMM(), shownNow=false, isTodayCol=iso(dateFor(dayIdx))===todayIso();
     for(var j=0;j<rows.length;j++){
       var x=rows[j];
-      if(viewingToday() && !shownNow && x.time>now){ html += '<div class="nowbar">adesso<i></i>'+now+'</div>'; shownNow=true; }
-      var recurring = x.rep && x.rep!=="none";
-      var urg = !!x.urgente || x.type==="scadenza";
-      var done = isDone(x, iso(dateFor(selected)));
-      var tone = done ? "done" : (urg ? "urg" : (recurring ? "rip" : ""));
-      html += '<div class="row'+(focus===x.id?" now":"")+'"><div class="hh">'+esc(x.time)+'</div><div class="rail"><div class="dotline '+esc(x.type)+(tone?" "+tone:"")+'"></div></div><div class="card'+(tone?" "+tone:"")+'">'+
-        '<div class="acts"><button type="button" class="skip edit" data-done="'+esc(x.id)+'">'+(done?"Annulla":"Fatto")+'</button><button type="button" class="skip edit" data-edit="'+esc(x.id)+'">Modifica</button>'+(recurring?'<button type="button" class="skip" data-skip="'+esc(x.id)+'">Salta</button>':'')+
-        '<button type="button" class="del" data-del="'+esc(x.id)+'">×</button></div>'+
-        '<div class="title">'+esc(x.title)+'</div><div class="meta"><span class="tag t-'+esc(x.type)+'">'+esc(LABELS[x.type]||x.type)+'</span>'+
-        (done?'<span class="tag t-done">Fatto</span>':'')+
-        (urg && !done?'<span class="tag t-urg">Urgente</span>':'')+
-        (recurring?'<span class="tag t-rip">'+esc(REPS[x.rep])+'</span> ':'')+esc(x.note||"")+'</div></div></div>';
+      if(isTodayCol && !shownNow && x.time>now){ html += '<div class="nowbar">adesso<i></i>'+now+'</div>'; shownNow=true; }
+      html += cardHtml(x, dayIdx);
     }
-    if(viewingToday() && !shownNow) html += '<div class="nowbar">adesso<i></i>'+now+'</div>';
-    $("list").innerHTML = html+"</div>";
+    if(isTodayCol && !shownNow) html += '<div class="nowbar">adesso<i></i>'+now+'</div>';
+    return html+'</div>';
+  }
+  function buildWeekBoard(){
+    var curIso=todayIso(), html='<div class="pc-hint">Vista settimana · clicca un giorno per selezionarlo</div><div class="weekgrid">';
+    for(var i=0;i<7;i++){
+      var d=dateFor(i), isToday=iso(d)===curIso;
+      html += '<div class="col'+(i===selected?" on":"")+(isToday?" today":"")+'" data-col="'+i+'">'+
+        '<div class="colhead" data-day="'+i+'"><div class="dn">'+DAYS[i]+'</div><div class="dd">'+d.getDate()+' '+MESI[d.getMonth()]+'</div></div>'+
+        dayTimeline(i)+'</div>';
+    }
+    return html+'</div>';
   }
   function speak(){
     var p=phrase(), wrap=$("ninoWrap");
@@ -423,10 +483,16 @@
     var editBtn=e.target.closest("[data-edit]");
     var skipBtn=e.target.closest("[data-skip]");
     var delBtn=e.target.closest("[data-del]");
+    var col = e.target.closest("[data-col]");
+    if(col && !doneBtn && !editBtn && !skipBtn && !delBtn){
+      selected = Number(col.getAttribute("data-col")); render(); return;
+    }
     if(doneBtn){
       var item=findItem(doneBtn.getAttribute("data-done"));
       if(!item) return;
-      item.doneDates = toggleDate(item.doneDates, iso(dateFor(selected)));
+      var d = doneBtn.getAttribute("data-day");
+      var dayIdx = d==null ? selected : Number(d);
+      item.doneDates = toggleDate(item.doneDates, iso(dateFor(dayIdx)));
       persist(); render(); return;
     }
     if(editBtn){
@@ -437,9 +503,12 @@
     if(skipBtn){
       var item=findItem(skipBtn.getAttribute("data-skip"));
       if(!item) return;
-      var day=iso(dateFor(selected));
+      var d = skipBtn.getAttribute("data-day");
+      var dayIdx = d==null ? selected : Number(d);
+      var day=iso(dateFor(dayIdx));
       item.skips = item.skips || [];
       if(item.skips.indexOf(day)===-1) item.skips.push(day);
+      selected = dayIdx;
       persist(); render(); return;
     }
     if(delBtn){
