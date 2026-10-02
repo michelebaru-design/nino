@@ -716,13 +716,48 @@
     speechSynthesis.speak(u);
   }
 
-  function fillDays(){
+  function weekLabelForOff(off){
+    if(off===0) return "questa sett.";
+    if(off===1) return "prossima sett.";
+    if(off===-1) return "sett. scorsa";
+    if(off>1) return "tra "+off+" sett.";
+    return (-off)+" sett. fa";
+  }
+  function fillDays(preferIso){
     var html="";
-    for(var i=0;i<7;i++){
-      var d=dateFor(i);
-      html += '<option value="'+i+'">'+DAYS[i]+" "+d.getDate()+"/"+(d.getMonth()+1)+'</option>';
+    var mon = thisMonday();
+    // da 4 settimane fa a 8 settimane avanti rispetto a oggi
+    for(var w=-4; w<=8; w++){
+      for(var i=0;i<7;i++){
+        var d = new Date(mon);
+        d.setDate(d.getDate() + w*7 + i);
+        d.setHours(12,0,0,0);
+        var val = iso(d);
+        var lab = DAYS[i]+" "+d.getDate()+"/"+(d.getMonth()+1)+" · "+weekLabelForOff(w);
+        html += '<option value="'+val+'">'+lab+'</option>';
+      }
     }
-    $("fDay").innerHTML=html; $("fDay").value=String(selected);
+    $("fDay").innerHTML=html;
+    var target = preferIso || iso(dateFor(selected));
+    if(!$("fDay").querySelector('option[value="'+target+'"]')){
+      // fallback: aggiungi il giorno preferito se fuori range
+      var extra = new Date(target+"T12:00:00");
+      var di = extra.getDay(); di = di===0?6:di-1;
+      $("fDay").innerHTML = '<option value="'+target+'">'+DAYS[di]+" "+extra.getDate()+"/"+(extra.getMonth()+1)+'</option>' + html;
+    }
+    $("fDay").value = target;
+  }
+  function parseDaySelect(){
+    // restituisce { dateStr, weekday, weekOffApprox }
+    var val = $("fDay").value;
+    if(/^\d{4}-\d{2}-\d{2}$/.test(val)){
+      var d = new Date(val+"T12:00:00");
+      var wd = d.getDay(); wd = wd===0?6:wd-1;
+      return { dateStr: val, weekday: wd };
+    }
+    // legacy: indice 0-6 della settimana visualizzata
+    var day = Number(val)||0;
+    return { dateStr: iso(dateFor(day)), weekday: day };
   }
   function mark(group, attr, value){
     var all=$(group).querySelectorAll(".chip");
@@ -731,12 +766,19 @@
   function findItem(id){ for(var i=0;i<items.length;i++) if(items[i].id===id) return items[i]; return null; }
 
   function checkFormConflict(){
-    var day = Number($("fDay").value);
+    var parsed = parseDaySelect();
     var tStart = $("fTime").value||"09:00";
     var tEnd = $("fTimeEnd").value||addHour(tStart);
     var draft = { time:tStart, timeEnd:tEnd, type:pickType };
     if(pickType==="habit" || pickType==="assenza"){ $("conflictWarn").className="conflict-warn"; return; }
-    var conf = hasConflict(draft, day, editId);
+    // confronta con gli impegni che cadono in quella data assoluta
+    var conf = null;
+    for(var i=0;i<items.length;i++){
+      var x = items[i];
+      if(editId && x.id===editId) continue;
+      if(!happensOn(x, parsed.weekday, parsed.dateStr)) continue;
+      if(overlaps(draft, x)){ conf = x; break; }
+    }
     if(conf){
       $("conflictWarn").textContent = "Si sovrappone a: "+conf.title+" ("+timeRange(conf)+")";
       $("conflictWarn").className = "conflict-warn show";
@@ -876,25 +918,8 @@
     if(dupBtn){
       var item=findItem(dupBtn.getAttribute("data-dup"));
       if(!item) return;
-      var d = dupBtn.getAttribute("data-day");
-      var dayIdx = d==null ? selected : Number(d);
-      var copy = {
-        id: String(Date.now()),
-        title: item.title,
-        time: item.time || "09:00",
-        timeEnd: item.timeEnd || addHour(item.time || "09:00"),
-        type: item.type,
-        rep: "none",
-        urgente: !!item.urgente,
-        weekday: dayIdx,
-        date: iso(dateFor(dayIdx)),
-        note: item.note || "",
-        skips: [],
-        doneDates: []
-      };
-      items.push(copy);
-      selected = dayIdx;
-      persist(); render();
+      // apre il form precompilato come NUOVO impegno: puoi cambiare giorno/settimana
+      openForm(item, true);
       return;
     }
     if(snoozeBtn){
@@ -1008,25 +1033,35 @@
   $("fTimeEnd").onchange=checkFormConflict;
   $("fDay").onchange=checkFormConflict;
 
-  function openForm(item){
-    fillDays();
+  function openForm(item, asCopy){
+    var preferIso = null;
+    if(item && !asCopy){
+      if(item.rep && item.rep!=="none") preferIso = iso(dateFor(Number(item.weekday)));
+      else preferIso = item.date || iso(dateFor(selected));
+    } else if(item && asCopy){
+      preferIso = iso(dateFor(selected));
+    } else {
+      preferIso = iso(dateFor(selected));
+    }
+    fillDays(preferIso);
     if(item){
-      editId = item.id;
-      $("formTitle").textContent = "Modifica impegno";
-      $("saveBtn").textContent = "Aggiorna";
+      if(asCopy){
+        editId = null;
+        $("formTitle").textContent = "Copia impegno";
+        $("saveBtn").textContent = "Salva copia";
+        pickRep = "none";
+      } else {
+        editId = item.id;
+        $("formTitle").textContent = "Modifica impegno";
+        $("saveBtn").textContent = "Aggiorna";
+        pickRep = item.rep || "none";
+      }
       $("fTitle").value = item.title || "";
       $("fTime").value = item.time || "09:00";
       $("fTimeEnd").value = item.timeEnd || addHour(item.time || "09:00");
       $("fNote").value = item.note || "";
       pickType = item.type || "riunione";
-      pickRep = item.rep || "none";
       pickUrg = !!item.urgente;
-      var day = selected;
-      if(item.rep && item.rep!=="none") day = Number(item.weekday);
-      else {
-        for(var i=0;i<7;i++) if(iso(dateFor(i))===item.date) day = i;
-      }
-      $("fDay").value = String(day);
     } else {
       editId = null;
       $("form").reset();
@@ -1034,7 +1069,6 @@
       $("saveBtn").textContent = "Salva";
       $("fTime").value = "09:00";
       $("fTimeEnd").value = "10:00";
-      $("fDay").value = String(selected);
       pickType = "riunione";
       pickRep = "none";
       pickUrg = false;
@@ -1062,14 +1096,16 @@
   $("form").onsubmit=function(e){
     if(e&&e.preventDefault) e.preventDefault();
     var title=$("fTitle").value.replace(/^\s+|\s+$/g,""); if(!title) return false;
-    var day=Number($("fDay").value);
+    var parsed = parseDaySelect();
+    var day = parsed.weekday;
+    var dateStr = parsed.dateStr;
     var tStart = $("fTime").value||"09:00";
     var tEnd = $("fTimeEnd").value||addHour(tStart);
     if(pickType !== "habit" && tEnd < tStart) tEnd = addHour(tStart);
     if(pickType === "habit"){ tStart = ""; tEnd = ""; }
     var payload = {
       title:title, time:tStart, timeEnd:tEnd, type:pickType, rep:pickRep,
-      urgente:!!pickUrg, weekday:day, date:iso(dateFor(day)),
+      urgente:!!pickUrg, weekday:day, date:dateStr,
       note:$("fNote").value.replace(/^\s+|\s+$/g,"")
     };
     if(editId){
@@ -1085,7 +1121,13 @@
       items.push(payload);
       if(payload.type === "scadenza" && payload.rep === "none") createPrepTask(payload);
     }
-    selected=day; persist(); $("sheet").className="sheet"; render(); return false;
+    // porta la vista alla settimana del giorno scelto
+    var target = new Date(dateStr+"T12:00:00");
+    var mon = thisMonday();
+    var diffDays = Math.round((target - mon) / 86400000);
+    weekOff = Math.floor(diffDays / 7);
+    selected = ((diffDays % 7) + 7) % 7;
+    persist(); $("sheet").className="sheet"; render(); return false;
   };
   try { render(); } catch(err){ $("speech").textContent="Errore: "+err.message; }
 })();
