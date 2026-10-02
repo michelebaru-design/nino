@@ -1074,15 +1074,18 @@
       pickUrg = !!item.urgente;
     } else {
       editId = null;
-      $("form").reset();
       $("formTitle").textContent = "Nuovo impegno";
       $("saveBtn").textContent = "Salva";
+      $("fTitle").value = "";
       $("fTime").value = "09:00";
       $("fTimeEnd").value = "10:00";
+      $("fNote").value = "";
       pickType = "riunione";
       pickRep = "none";
       pickUrg = false;
     }
+    // ripristina sempre il giorno scelto (reset/form non devono sovrascriverlo)
+    $("fDay").value = preferIso;
     mark("types","data-type",pickType);
     mark("reps","data-rep",pickRep);
     mark("prio","data-urg", pickUrg?"1":"0");
