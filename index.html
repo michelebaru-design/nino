@@ -733,29 +733,45 @@
     return (-off)+" sett. fa";
   }
   function fillDays(preferIso){
-    var html="";
     var mon = thisMonday();
-    // da 4 settimane fa a 8 settimane avanti rispetto a oggi
-    for(var w=-4; w<=8; w++){
+    var target = preferIso || iso(dateFor(selected));
+    // settimana corrente prima, poi future, poi passate (se value fallisce resta sul giorno giusto)
+    var order = [0];
+    for(var wf=1; wf<=8; wf++) order.push(wf);
+    for(var wp=-1; wp>=-4; wp--) order.push(wp);
+    var html = "";
+    var found = false;
+    for(var oi=0; oi<order.length; oi++){
+      var w = order[oi];
       html += '<optgroup label="'+weekLabelForOff(w)+'">';
       for(var i=0;i<7;i++){
-        var d = new Date(mon);
-        d.setDate(d.getDate() + w*7 + i);
+        var d = new Date(mon.getTime());
+        d.setDate(mon.getDate() + w*7 + i);
         d.setHours(12,0,0,0);
         var val = iso(d);
-        var lab = DAYS[i]+" "+d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear();
-        html += '<option value="'+val+'">'+lab+'</option>';
+        var lab = DAYS[i]+" "+d.getDate()+"/"+(d.getMonth()+1);
+        if(val === target){ html += '<option value="'+val+'" selected>'+lab+'</option>'; found = true; }
+        else html += '<option value="'+val+'">'+lab+'</option>';
       }
       html += '</optgroup>';
     }
-    $("fDay").innerHTML=html;
-    var target = preferIso || iso(dateFor(selected));
-    if(!$("fDay").querySelector('option[value="'+target+'"]')){
+    if(!found && target){
       var extra = new Date(target+"T12:00:00");
-      var di = extra.getDay(); di = di===0?6:di-1;
-      $("fDay").innerHTML = '<optgroup label="altra data"><option value="'+target+'">'+DAYS[di]+" "+extra.getDate()+"/"+(extra.getMonth()+1)+"/"+extra.getFullYear()+'</option></optgroup>' + html;
+      if(!isNaN(extra.getTime())){
+        var di = extra.getDay(); di = di===0?6:di-1;
+        html = '<optgroup label="giorno scelto"><option value="'+target+'" selected>'+DAYS[di]+" "+extra.getDate()+"/"+(extra.getMonth()+1)+'</option></optgroup>' + html;
+        found = true;
+      }
     }
-    $("fDay").value = target;
+    $("fDay").innerHTML = html;
+    // forzatura su selectedIndex (più affidabile di .value con optgroup su mobile)
+    var sel = $("fDay");
+    sel.value = target;
+    if(sel.value !== target){
+      for(var k=0; k<sel.options.length; k++){
+        if(sel.options[k].value === target){ sel.selectedIndex = k; break; }
+      }
+    }
   }
   function parseDaySelect(){
     // restituisce { dateStr, weekday, weekOffApprox }
@@ -1051,7 +1067,8 @@
     } else if(item && asCopy){
       preferIso = iso(dateFor(selected));
     } else {
-      preferIso = iso(dateFor(selected));
+      // nuovo impegno: giorno selezionato, o oggi se siamo nella settimana corrente
+      preferIso = (weekOff===0 && selected===todayIndex()) ? todayIso() : iso(dateFor(selected));
     }
     fillDays(preferIso);
     if(item){
@@ -1084,8 +1101,14 @@
       pickRep = "none";
       pickUrg = false;
     }
-    // ripristina sempre il giorno scelto (reset/form non devono sovrascriverlo)
-    $("fDay").value = preferIso;
+    // ripristina sempre il giorno scelto
+    var selDay = $("fDay");
+    selDay.value = preferIso;
+    if(selDay.value !== preferIso){
+      for(var si=0; si<selDay.options.length; si++){
+        if(selDay.options[si].value === preferIso){ selDay.selectedIndex = si; break; }
+      }
+    }
     mark("types","data-type",pickType);
     mark("reps","data-rep",pickRep);
     mark("prio","data-urg", pickUrg?"1":"0");
