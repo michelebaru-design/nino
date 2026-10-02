@@ -78,10 +78,13 @@
     .day .dot { width:5px; height:5px; border-radius:50%; margin:4px auto 0; background:transparent; }
     .day.has .dot { background:#ffd15a; }
     .day.on.has .dot { background:#fff; }
+    .day.blocked-day .dot { background:#e25563; }
+    .day.on.blocked-day .dot { background:#ffb3b3; }
+    .day.blocked-day:not(.on) { outline:2px solid #e25563; }
     .board { flex:1; overflow:auto; background:#fff; border-radius:20px; padding:12px 10px 16px; }
     .empty { text-align:center; color:var(--muted); padding:36px 12px; font-weight:600; }
-    .row { display:grid; grid-template-columns:52px 14px 1fr; gap:0 8px; min-height:64px; }
-    .hh { font-weight:800; color:var(--navy); font-size:13px; padding-top:2px; }
+    .row { display:grid; grid-template-columns:58px 14px 1fr; gap:0 8px; min-height:64px; }
+    .hh { font-weight:800; color:var(--navy); font-size:11px; padding-top:2px; line-height:1.25; word-break:break-all; }
     .rail { position:relative; }
     .rail:before { content:""; position:absolute; left:5px; top:10px; bottom:-8px; width:2px; background:#d7e2f2; }
     .row:last-child .rail:before { display:none; }
@@ -89,21 +92,28 @@
     .dotline.scadenza { background:#e08a16; border-color:#ffe0bd; }
     .dotline.call { background:#1f9d6a; border-color:#cfeedf; }
     .dotline.task { background:#6b3cc3; border-color:#eadbff; }
+    .dotline.assenza { background:#c43c3c; border-color:#ffc9c9; }
     .card { background:#f5f8fd; border-radius:14px; padding:9px 10px; margin-bottom:8px; }
     .now .card { outline:2px solid var(--blue); background:#eef4ff; }
     .card.rip { background:#fff4c4; }
     .card.urg { background:#ffd6d6; }
     .card.done { background:#c9f2d4; }
+    .card.blocked { background:#ffd0d0; outline:2px solid #e25563; }
+    .card.assenza { background:#ffe0e0; }
     .now .card.rip { outline-color:#e0b12d; background:#ffe99a; }
     .now .card.urg { outline-color:#d64545; background:#ffc4c4; }
     .now .card.done { outline-color:#1f9d6a; background:#b5ebc6; }
+    .now .card.blocked { outline-color:#c43c3c; background:#ffb8b8; }
     .dotline.rip { background:#e0b12d; border-color:#ffe9a0; }
     .dotline.urg { background:#d64545; border-color:#ffb3b3; }
     .dotline.done { background:#1f9d6a; border-color:#b5ebc6; }
+    .dotline.blocked { background:#c43c3c; border-color:#ffb3b3; }
     .t-rip { background:#ffe9a0; color:#8a6a00; }
     .t-urg { background:#ffb3b3; color:#9b1c1c; }
     .t-done { background:#b5ebc6; color:#0f7a4a; }
+    .t-blocked { background:#ffb3b3; color:#9b1c1c; }
     .card.done .title { text-decoration:line-through; opacity:.75; }
+    .card.blocked .title { color:#9b1c1c; }
     .title { font-weight:750; font-size:15px; padding-right:78px; }
     .meta { color:var(--muted); font-size:12px; margin-top:3px; }
     .tag { display:inline-block; font-size:10px; font-weight:800; padding:2px 6px; border-radius:999px; margin-right:4px; }
@@ -111,6 +121,7 @@
     .t-scadenza { background:#ffe8d6; color:#b35400; }
     .t-call { background:#e7f8ef; color:#0f7a4a; }
     .t-task { background:#f1e9ff; color:#6b3cc3; }
+    .t-assenza { background:#ffd0d0; color:#9b1c1c; }
     .rep { font-size:10px; font-weight:800; color:var(--blue); }
     .acts { float:right; display:flex; gap:4px; margin:-2px 0 0; }
     .del, .skip { height:28px; border-radius:9px; background:#fff; font-size:11px; font-weight:800; padding:0 8px; }
@@ -129,12 +140,47 @@
     textarea { min-height:64px; resize:none; }
     .row2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
     .types, .reps { display:grid; gap:6px; }
-    .types { grid-template-columns:repeat(4,1fr); }
+    .types { grid-template-columns:repeat(3,1fr); }
     .reps { grid-template-columns:repeat(4,1fr); }
     .chip { background:#f3f6fb; border-radius:12px; padding:9px 4px; font-size:11px; font-weight:800; }
     .chip.on { background:var(--navy); color:#fff; }
     .urgchip.on { background:#d64545; }
     .save { width:100%; margin-top:14px; }
+    .toolbar { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; align-items:center; }
+    .toolbar .chip { padding:7px 10px; font-size:11px; }
+    .searchbox { flex:1; min-width:120px; padding:8px 12px; border:1.5px solid #dbe4f3; border-radius:12px; background:#fff; font:inherit; font-size:13px; }
+    .loadbar-wrap { background:#fff; border-radius:12px; padding:8px 10px; margin-bottom:8px; }
+    .loadbar-label { display:flex; justify-content:space-between; font-size:11px; font-weight:700; color:var(--muted); margin-bottom:5px; }
+    .loadbar { height:8px; background:#e8eef8; border-radius:99px; overflow:hidden; }
+    .loadbar > i { display:block; height:100%; background:var(--blue); border-radius:99px; transition:width .25s; }
+    .loadbar.high > i { background:#e08a16; }
+    .loadbar.full > i { background:#e25563; }
+    .card.conflict { background:#ffe8d0; outline:2px solid #e08a16; }
+    .now .card.conflict { outline-color:#c97800; background:#ffd9b0; }
+    .dotline.conflict { background:#e08a16; border-color:#ffe0bd; }
+    .t-conflict { background:#ffe0bd; color:#8a4b00; }
+    .t-habit { background:#e0f0ff; color:#1a5f9e; }
+    .dotline.habit { background:#3a9ad9; border-color:#c5e5f8; }
+    .card.habit { background:#eef6fc; }
+    .habits-box { background:#f0f6ff; border-radius:14px; padding:10px; margin-bottom:10px; }
+    .habits-box h3 { margin:0 0 8px; font-size:13px; color:var(--navy); }
+    .habit-row { display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid #dbe4f3; }
+    .habit-row:last-child { border-bottom:0; }
+    .habit-row input[type=checkbox] { width:20px; height:20px; accent-color:var(--navy); }
+    .habit-row.done span { text-decoration:line-through; opacity:.65; }
+    .habit-row .hacts { margin-left:auto; display:flex; gap:4px; }
+    .view-toggle { display:flex; gap:4px; margin-bottom:8px; }
+    .view-toggle .chip { flex:1; text-align:center; }
+    .conflict-warn { background:#fff3e0; color:#8a4b00; border-radius:12px; padding:10px; font-size:13px; font-weight:650; margin:10px 0; display:none; }
+    .conflict-warn.show { display:block; }
+    .stats-panel { font-size:13px; line-height:1.5; }
+    .stats-panel b { color:var(--navy); }
+    .mode-today .days { display:none; }
+    .mode-today .weekgrid { display:block !important; }
+    .mode-today .col { display:none !important; }
+    .mode-today .col.on { display:flex !important; flex-direction:column; }
+    .mode-today .colhead { display:block; }
+    .mode-today .pc-hint { display:none; }
     .bob { animation:bob 2.8s ease-in-out infinite; transform-origin:50% 100%; }
     @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
     .blink { animation:blink 4.2s infinite; }
@@ -168,7 +214,8 @@
       .colhead { display:block; text-align:center; margin-bottom:8px; cursor:pointer; }
       .colhead .dn { font-size:11px; font-weight:800; color:var(--muted); }
       .colhead .dd { font-size:18px; font-weight:800; }
-      .col .row { grid-template-columns:42px 1fr; gap:6px; min-height:auto; }
+      .col .row { grid-template-columns:52px 1fr; gap:6px; min-height:auto; }
+      .col .hh { font-size:10px; }
       .col .rail { display:none; }
       .col .card { margin-bottom:6px; padding:8px; }
       .col .title { font-size:13px; padding-right:0; }
@@ -261,6 +308,27 @@
     <div class="actions">
       <button type="button" class="btn" id="talkBtn">Briefing</button>
       <button type="button" class="btn ghost" id="addBtn">+ Impegno</button>
+      <button type="button" class="btn ghost" id="statsBtn" style="flex:0.6">Stats</button>
+    </div>
+    <div class="view-toggle">
+      <button type="button" class="chip on" id="viewWeek" data-view="week">Settimana</button>
+      <button type="button" class="chip" id="viewToday" data-view="today">Solo oggi</button>
+    </div>
+    <div class="toolbar">
+      <input type="search" class="searchbox" id="searchBox" placeholder="Cerca titolo o nota…">
+    </div>
+    <div class="toolbar" id="filters">
+      <button type="button" class="chip on" data-filter="all">Tutti</button>
+      <button type="button" class="chip" data-filter="riunione">Riunioni</button>
+      <button type="button" class="chip" data-filter="call">Call</button>
+      <button type="button" class="chip" data-filter="scadenza">Scadenze</button>
+      <button type="button" class="chip" data-filter="task">Task</button>
+      <button type="button" class="chip" data-filter="assenza">Assenze</button>
+      <button type="button" class="chip" data-filter="habit">Abitudini</button>
+    </div>
+    <div class="loadbar-wrap" id="loadWrap">
+      <div class="loadbar-label"><span id="loadText">0h / 8h · 8–12 · 13–17</span><span id="loadPct">0%</span></div>
+      <div class="loadbar" id="loadBar"><i id="loadFill" style="width:0%"></i></div>
     </div>
     <div class="days" id="days"></div>
     <div class="board" id="list"></div>
@@ -275,6 +343,8 @@
         <button type="button" class="chip" data-type="call">Call</button>
         <button type="button" class="chip" data-type="scadenza">Scadenza</button>
         <button type="button" class="chip" data-type="task">Task</button>
+        <button type="button" class="chip" data-type="assenza">Assenza</button>
+        <button type="button" class="chip" data-type="habit">Abitudine</button>
       </div>
       <label>Priorità</label>
       <div class="types" id="prio">
@@ -283,10 +353,13 @@
       </div>
       <label>Cosa</label>
       <input id="fTitle" required maxlength="90" placeholder="Es. standup, report, call cliente">
-      <div class="row2">
-        <div><label>Giorno</label><select id="fDay"></select></div>
-        <div><label>Ora</label><input id="fTime" type="time" value="09:30" required></div>
+      <label>Giorno</label>
+      <select id="fDay"></select>
+      <div class="row2" id="timeRow">
+        <div><label>Inizio</label><input id="fTime" type="time" value="09:00" required></div>
+        <div><label>Fine</label><input id="fTimeEnd" type="time" value="10:00" required></div>
       </div>
+      <div class="conflict-warn" id="conflictWarn"></div>
       <label>Ricorrenza</label>
       <div class="reps" id="reps">
         <button type="button" class="chip on" data-rep="none">Solo quel giorno</button>
@@ -299,15 +372,75 @@
       <button class="btn save" type="submit" id="saveBtn">Salva</button>
     </form>
   </div>
+  <div class="sheet" id="doneSheet">
+    <div class="panel">
+      <div class="grab"></div>
+      <h2>Segna come fatto</h2>
+      <label>Esito (opzionale)</label>
+      <textarea id="doneNote" maxlength="120" placeholder="Es. chiuso con cliente, rimandato, ok…"></textarea>
+      <button class="btn save" type="button" id="doneConfirm">Conferma fatto</button>
+      <button class="btn ghost save" type="button" id="doneCancel" style="margin-top:8px;background:#f3f6fb;color:var(--navy)">Annulla</button>
+    </div>
+  </div>
+  <div class="sheet" id="statsSheet">
+    <div class="panel">
+      <div class="grab"></div>
+      <h2>Statistiche settimana</h2>
+      <div class="stats-panel" id="statsBody"></div>
+      <button class="btn save" type="button" id="statsClose">Chiudi</button>
+    </div>
+  </div>
 <script>
 (function () {
   var DAYS = ["Lun","Mar","Mer","Gio","Ven","Sab","Dom"];
   var DAYS_LONG = ["lunedì","martedì","mercoledì","giovedì","venerdì","sabato","domenica"];
-  var LABELS = { riunione:"Riunione", call:"Call", scadenza:"Scadenza", task:"Task" };
+  var LABELS = { riunione:"Riunione", call:"Call", scadenza:"Scadenza", task:"Task", assenza:"Assenza", habit:"Abitudine" };
   var REPS = { none:"una tantum", weekly:"ogni settimana", weekdays:"lun-ven", daily:"tutti i giorni" };
-  var KEY = "nino-lavoro-v3";
+  var KEY = "nino-lavoro-v5";
+  var WORK_START = "08:00";
+  var WORK_END = "17:00";
+  var WORK_HOURS = 8; // 08–12 + 13–17
+
   function $(id){ return document.getElementById(id); }
   function pad(n){ return (n<10?"0":"")+n; }
+  function addHour(hhmm){
+    var p = String(hhmm||"09:00").split(":");
+    var h = Number(p[0])||9, m = Number(p[1])||0;
+    h = (h + 1) % 24;
+    return pad(h)+":"+pad(m);
+  }
+  function toMinutes(hhmm){
+    var p = String(hhmm||"00:00").split(":");
+    return (Number(p[0])||0)*60 + (Number(p[1])||0);
+  }
+  function timeRange(x){
+    if(x.type === "habit") return "Abit.";
+    var s = x.time || "09:00";
+    var e = x.timeEnd || addHour(s);
+    return s === e ? s : s+"–"+e;
+  }
+  function durationHours(x){
+    if(x.type === "habit") return 0;
+    var s = toMinutes(x.time || "09:00");
+    var e = toMinutes(x.timeEnd || addHour(x.time || "09:00"));
+    if(e < s) e += 24*60;
+    return (e - s) / 60;
+  }
+  function isBlocker(x){
+    if(!x) return false;
+    if(x.type === "assenza") return true;
+    if(x.type === "habit") return false;
+    return durationHours(x) >= 8;
+  }
+  function overlaps(a, b){
+    if(a.type==="habit" || b.type==="habit") return false;
+    if(a.type==="assenza" || b.type==="assenza") return false;
+    var as = toMinutes(a.time||"09:00"), ae = toMinutes(a.timeEnd||addHour(a.time||"09:00"));
+    var bs = toMinutes(b.time||"09:00"), be = toMinutes(b.timeEnd||addHour(b.time||"09:00"));
+    if(ae < as) ae += 24*60;
+    if(be < bs) be += 24*60;
+    return as < be && bs < ae;
+  }
   function todayIndex(){ var d=new Date().getDay(); return d===0?6:d-1; }
   function thisMonday(){
     var d=new Date(); var day=d.getDay();
@@ -335,6 +468,16 @@
     if(i===-1) arr.push(dateStr); else arr.splice(i,1);
     return arr;
   }
+  function getDoneNote(item, dateStr){
+    var n = item.doneNotes || {};
+    return n[dateStr] || "";
+  }
+  function setDoneNote(item, dateStr, note){
+    if(!item.doneNotes) item.doneNotes = {};
+    if(note) item.doneNotes[dateStr] = note;
+    else delete item.doneNotes[dateStr];
+  }
+
   var weekOff = 0;
   var selected = todayIndex();
   var items = load();
@@ -342,6 +485,10 @@
   var pickRep = "none";
   var pickUrg = false;
   var editId = null;
+  var viewMode = "week";
+  var typeFilter = "all";
+  var searchQ = "";
+  var pendingDone = null;
 
   function happensOn(item, dayIdx, dateStr){
     if(skipped(item, dateStr)) return false;
@@ -354,33 +501,85 @@
   function ofDay(dayIdx){
     var dateStr = iso(dateFor(dayIdx));
     return items.filter(function(x){ return happensOn(x, dayIdx, dateStr); })
-      .sort(function(a,b){ return String(a.time).localeCompare(String(b.time)); });
+      .sort(function(a,b){
+        if(a.type==="habit" && b.type!=="habit") return 1;
+        if(b.type==="habit" && a.type!=="habit") return -1;
+        return String(a.time||"").localeCompare(String(b.time||""));
+      });
   }
-  function uniqueWeekCount(){ var n=0; for(var i=0;i<7;i++) n += ofDay(i).length; return n; }
+  function ofDayFiltered(dayIdx){
+    var rows = ofDay(dayIdx);
+    if(typeFilter !== "all") rows = rows.filter(function(x){ return x.type === typeFilter; });
+    if(searchQ){
+      var q = searchQ.toLowerCase();
+      rows = rows.filter(function(x){
+        return (x.title||"").toLowerCase().indexOf(q)!==-1 || (x.note||"").toLowerCase().indexOf(q)!==-1;
+      });
+    }
+    return rows;
+  }
+  function dayHasBlocker(dayIdx){
+    var rows = ofDay(dayIdx);
+    for(var i=0;i<rows.length;i++) if(isBlocker(rows[i])) return true;
+    return false;
+  }
+  function hasConflict(item, dayIdx, excludeId){
+    var rows = ofDay(dayIdx);
+    for(var i=0;i<rows.length;i++){
+      if(excludeId && rows[i].id === excludeId) continue;
+      if(overlaps(item, rows[i])) return rows[i];
+    }
+    return null;
+  }
+  function dayLoadHours(dayIdx){
+    var rows = ofDay(dayIdx), h = 0;
+    for(var i=0;i<rows.length;i++){
+      if(rows[i].type === "habit") continue;
+      h += durationHours(rows[i]);
+    }
+    return Math.round(h * 10) / 10;
+  }
+  function uniqueWeekCount(){ var n=0; for(var i=0;i<7;i++) n += ofDay(i).filter(function(x){return x.type!=="habit";}).length; return n; }
   function weekDead(){
     var n=0; for(var i=0;i<7;i++) ofDay(i).forEach(function(x){ if(x.type==="scadenza") n++; }); return n;
   }
   function isCurrentWeek(){ return weekOff===0; }
   function viewingToday(){ return isCurrentWeek() && selected===todayIndex(); }
+
   function phrase(){
-    var rows=ofDay(selected), weekN=uniqueWeekCount(), dead=weekDead();
+    var rows=ofDay(selected), weekN=uniqueWeekCount();
+    var timed = rows.filter(function(x){ return x.type !== "habit"; });
     var dayName=DAYS_LONG[selected];
     var when = viewingToday() ? "Oggi" : (DAYS_LONG[selected].charAt(0).toUpperCase()+dayName.slice(1));
     if(weekOff===1) when = "Il prossimo "+dayName;
     if(weekOff>1) when = dayName+" tra "+weekOff+" settimane";
     if(weekOff===-1) when = "Il "+dayName+" scorso";
     if(weekOff<-1) when = dayName+" di "+(-weekOff)+" settimane fa";
+
+    var hasBlock = dayHasBlocker(selected);
+    var blockedN = 0;
+    if(hasBlock) for(var bi=0;bi<rows.length;bi++) if(rows[bi].rep && rows[bi].rep!=="none" && !isBlocker(rows[bi])) blockedN++;
+
     if(!items.length) return { main:"Nessun impegno in archivio. Ne mettiamo uno anche tra due settimane?", sub:"Usa le frecce in alto per cambiare settimana." };
-    if(!rows.length) return { main: when+" non hai nulla in agenda.", sub: weekN? (weekN+" impegni in questa settimana."):"Questa settimana è libera." };
-    if(rows.length===1) return { main: when+" alle "+rows[0].time+": "+rows[0].title+".", sub: (LABELS[rows[0].type]||"")+(rows[0].rep && rows[0].rep!=="none"?" · "+REPS[rows[0].rep]:"") };
-    return { main: when+" hai "+rows.length+" impegni, dal "+rows[0].time+" al "+rows[rows.length-1].time+".", sub: rows.map(function(x){ return x.time+" "+x.title; }).join(", ")+"." };
+    if(hasBlock && blockedN) return { main: when+" sei fuori: i ricorrenti sono in pausa.", sub: blockedN+" impegni ricorrenti risultano bloccati." };
+    if(!timed.length) return { main: when+" giornata libera, bravo.", sub: weekN? (weekN+" impegni in questa settimana."):"Questa settimana è libera." };
+    if(timed.length >= 5) return { main: when+" giornata intensa, respira. Hai "+timed.length+" impegni.", sub: timed.map(function(x){ return timeRange(x)+" "+x.title; }).join(", ")+"." };
+    if(timed.length===1) return { main: when+" "+timeRange(timed[0])+": "+timed[0].title+".", sub: (LABELS[timed[0].type]||"")+(timed[0].rep && timed[0].rep!=="none"?" · "+REPS[timed[0].rep]:"") };
+    return { main: when+" hai "+timed.length+" impegni, dal "+timed[0].time+" al "+(timed[timed.length-1].timeEnd||timed[timed.length-1].time)+".", sub: timed.map(function(x){ return timeRange(x)+" "+x.title; }).join(", ")+"." };
   }
+
   function nearestId(rows){
     if(!viewingToday() || !rows.length) return null;
     var now=nowHHMM(), next=null;
-    for(var i=0;i<rows.length;i++) if(rows[i].time>=now){ next=rows[i].id; break; }
-    return next || rows[rows.length-1].id;
+    for(var i=0;i<rows.length;i++){
+      if(rows[i].type==="habit") continue;
+      if(rows[i].time>=now){ next=rows[i].id; break; }
+    }
+    if(next) return next;
+    for(var j=rows.length-1;j>=0;j--) if(rows[j].type!=="habit") return rows[j].id;
+    return null;
   }
+
   var MESI = ["gen","feb","mar","apr","mag","giu","lug","ago","set","ott","nov","dic"];
   function fmtRange(){
     var a=dateFor(0), b=dateFor(6);
@@ -392,9 +591,23 @@
     if(weekOff>1) return "Tra "+weekOff+" settimane\n"+left+" – "+right;
     return (-weekOff)+" settimane fa\n"+left+" – "+right;
   }
+
+  function updateLoadBar(){
+    var h = dayLoadHours(selected);
+    var pct = Math.min(100, Math.round((h / WORK_HOURS) * 100));
+    $("loadText").textContent = h + "h / " + WORK_HOURS + "h · 8–12 · 13–17";
+    $("loadPct").textContent = pct + "%";
+    $("loadFill").style.width = pct + "%";
+    var bar = $("loadBar");
+    bar.className = "loadbar" + (pct >= 100 ? " full" : (pct >= 75 ? " high" : ""));
+  }
+
   function render(){
+    document.querySelector(".app").className = "app" + (viewMode==="today" ? " mode-today" : "");
+    if(viewMode === "today" && isCurrentWeek()) selected = todayIndex();
     $("weekLabel").innerText = fmtRange();
-    $("sToday").textContent = ofDay(selected).length;
+    var timedCount = ofDay(selected).filter(function(x){return x.type!=="habit";}).length;
+    $("sToday").textContent = timedCount;
     $("sTodayL").textContent = viewingToday() ? "OGGI" : DAYS[selected].toUpperCase();
     $("sWeek").textContent = uniqueWeekCount();
     $("sDead").textContent = weekDead();
@@ -403,42 +616,87 @@
     var days="", curIso=todayIso();
     for(var i=0;i<7;i++){
       var d=dateFor(i), isToday=iso(d)===curIso;
-      days += '<button type="button" class="day'+(i===selected?" on":"")+(ofDay(i).length?" has":"")+(isToday?" today":"")+'" data-day="'+i+'"><div class="dn">'+DAYS[i]+'</div><div class="dd">'+d.getDate()+'</div><div class="dot"></div></button>';
+      var blk = dayHasBlocker(i);
+      days += '<button type="button" class="day'+(i===selected?" on":"")+(ofDay(i).length?" has":"")+(isToday?" today":"")+(blk?" blocked-day":"")+'" data-day="'+i+'"><div class="dn">'+DAYS[i]+'</div><div class="dd">'+d.getDate()+'</div><div class="dot"></div></button>';
     }
     $("days").innerHTML=days;
     $("list").innerHTML = buildWeekBoard();
+    updateLoadBar();
+    $("viewWeek").className = "chip"+(viewMode==="week"?" on":"");
+    $("viewToday").className = "chip"+(viewMode==="today"?" on":"");
   }
+
   function cardHtml(x, dayIdx){
     var dateStr = iso(dateFor(dayIdx));
     var recurring = x.rep && x.rep!=="none";
     var urg = !!x.urgente || x.type==="scadenza";
     var done = isDone(x, dateStr);
-    var tone = done ? "done" : (urg ? "urg" : (recurring ? "rip" : ""));
+    var blocked = !done && recurring && !isBlocker(x) && dayHasBlocker(dayIdx);
+    var conflict = !done && !blocked && x.type!=="habit" && hasConflict(x, dayIdx, x.id);
+    var tone = done ? "done" : (blocked ? "blocked" : (conflict ? "conflict" : (x.type==="assenza" ? "assenza" : (x.type==="habit" ? "habit" : (urg ? "urg" : (recurring ? "rip" : ""))))));
     var isTodayCol = iso(dateFor(dayIdx))===todayIso();
     var focus = isTodayCol ? nearestId(ofDay(dayIdx)) : null;
-    return '<div class="row'+(focus===x.id?" now":"")+'"><div class="hh">'+esc(x.time)+'</div><div class="rail"><div class="dotline '+esc(x.type)+(tone?" "+tone:"")+'"></div></div><div class="card'+(tone?" "+tone:"")+'">'+
-      '<div class="acts"><button type="button" class="skip edit" data-day="'+dayIdx+'" data-done="'+esc(x.id)+'">'+(done?"Annulla":"Fatto")+'</button><button type="button" class="skip edit" data-day="'+dayIdx+'" data-edit="'+esc(x.id)+'">Modifica</button>'+(recurring?'<button type="button" class="skip" data-day="'+dayIdx+'" data-skip="'+esc(x.id)+'">Salta</button>':'')+
+    var range = timeRange(x);
+    var doneNote = getDoneNote(x, dateStr);
+    return '<div class="row'+(focus===x.id?" now":"")+'"><div class="hh">'+esc(range)+'</div><div class="rail"><div class="dotline '+esc(x.type)+(tone?" "+tone:"")+'"></div></div><div class="card'+(tone?" "+tone:"")+'">'+
+      '<div class="acts">'+
+      '<button type="button" class="skip edit" data-day="'+dayIdx+'" data-done="'+esc(x.id)+'">'+(done?"Annulla":"Fatto")+'</button>'+
+      '<button type="button" class="skip edit" data-day="'+dayIdx+'" data-edit="'+esc(x.id)+'">Modifica</button>'+
+      '<button type="button" class="skip" data-day="'+dayIdx+'" data-dup="'+esc(x.id)+'">Copia</button>'+
+      (recurring||x.type!=="habit"?'<button type="button" class="skip" data-day="'+dayIdx+'" data-snooze="'+esc(x.id)+'">Rimanda</button>':'')+
+      (recurring?'<button type="button" class="skip" data-day="'+dayIdx+'" data-skip="'+esc(x.id)+'">Salta</button>':'')+
       '<button type="button" class="del" data-del="'+esc(x.id)+'">×</button></div>'+
       '<div class="title">'+esc(x.title)+'</div><div class="meta"><span class="tag t-'+esc(x.type)+'">'+esc(LABELS[x.type]||x.type)+'</span>'+
       (done?'<span class="tag t-done">Fatto</span>':'')+
-      (urg && !done?'<span class="tag t-urg">Urgente</span>':'')+
-      (recurring?'<span class="tag t-rip">'+esc(REPS[x.rep])+'</span> ':'')+esc(x.note||"")+'</div></div></div>';
+      (blocked?'<span class="tag t-blocked">Bloccato</span>':'')+
+      (conflict?'<span class="tag t-conflict">Conflitto</span>':'')+
+      (urg && !done && !blocked?'<span class="tag t-urg">Urgente</span>':'')+
+      (recurring?'<span class="tag t-rip">'+esc(REPS[x.rep])+'</span> ':'')+
+      esc(x.note||"")+
+      (doneNote?' <em style="color:#0f7a4a">→ '+esc(doneNote)+'</em>':'')+
+      '</div></div></div>';
   }
+
+  function habitsHtml(dayIdx){
+    var rows = ofDayFiltered(dayIdx).filter(function(x){ return x.type==="habit"; });
+    if(!rows.length) return "";
+    var dateStr = iso(dateFor(dayIdx));
+    var html = '<div class="habits-box"><h3>Abitudini</h3>';
+    for(var i=0;i<rows.length;i++){
+      var x = rows[i];
+      var done = isDone(x, dateStr);
+      html += '<div class="habit-row'+(done?" done":"")+'">'+
+        '<input type="checkbox" data-day="'+dayIdx+'" data-habit="'+esc(x.id)+'"'+(done?" checked":"")+'>'+
+        '<span>'+esc(x.title)+'</span>'+
+        '<div class="hacts">'+
+        '<button type="button" class="skip edit" data-day="'+dayIdx+'" data-edit="'+esc(x.id)+'" style="height:24px;font-size:10px">Mod</button>'+
+        '<button type="button" class="del" data-del="'+esc(x.id)+'" style="height:24px;width:24px;font-size:14px">×</button>'+
+        '</div></div>';
+    }
+    return html+'</div>';
+  }
+
   function dayTimeline(dayIdx){
-    var rows=ofDay(dayIdx);
-    if(!rows.length) return '<div class="empty">Libero</div>';
-    var html='<div class="tl">', now=nowHHMM(), shownNow=false, isTodayCol=iso(dateFor(dayIdx))===todayIso();
+    var all = ofDayFiltered(dayIdx);
+    var rows = all.filter(function(x){ return x.type !== "habit"; });
+    var habits = habitsHtml(dayIdx);
+    if(!rows.length && !habits) return '<div class="empty">Libero</div>';
+    var html = habits + '<div class="tl">';
+    var now=nowHHMM(), shownNow=false, isTodayCol=iso(dateFor(dayIdx))===todayIso();
     for(var j=0;j<rows.length;j++){
       var x=rows[j];
       if(isTodayCol && !shownNow && x.time>now){ html += '<div class="nowbar">adesso<i></i>'+now+'</div>'; shownNow=true; }
       html += cardHtml(x, dayIdx);
     }
-    if(isTodayCol && !shownNow) html += '<div class="nowbar">adesso<i></i>'+now+'</div>';
+    if(isTodayCol && !shownNow && rows.length) html += '<div class="nowbar">adesso<i></i>'+now+'</div>';
     return html+'</div>';
   }
+
   function buildWeekBoard(){
     var curIso=todayIso(), html='<div class="pc-hint">Vista settimana · clicca un giorno per selezionarlo</div><div class="weekgrid">';
-    for(var i=0;i<7;i++){
+    var start = 0, end = 7;
+    if(viewMode === "today"){ start = selected; end = selected+1; }
+    for(var i=start;i<end;i++){
       var d=dateFor(i), isToday=iso(d)===curIso;
       html += '<div class="col'+(i===selected?" on":"")+(isToday?" today":"")+'" data-col="'+i+'">'+
         '<div class="colhead" data-day="'+i+'"><div class="dn">'+DAYS[i]+'</div><div class="dd">'+d.getDate()+' '+MESI[d.getMonth()]+'</div></div>'+
@@ -446,6 +704,7 @@
     }
     return html+'</div>';
   }
+
   function speak(){
     var p=phrase(), wrap=$("ninoWrap");
     wrap.className="nino-wrap bob talking";
@@ -456,6 +715,7 @@
     u.onend=function(){ wrap.className="nino-wrap bob"; };
     speechSynthesis.speak(u);
   }
+
   function fillDays(){
     var html="";
     for(var i=0;i<7;i++){
@@ -470,21 +730,126 @@
   }
   function findItem(id){ for(var i=0;i<items.length;i++) if(items[i].id===id) return items[i]; return null; }
 
+  function checkFormConflict(){
+    var day = Number($("fDay").value);
+    var tStart = $("fTime").value||"09:00";
+    var tEnd = $("fTimeEnd").value||addHour(tStart);
+    var draft = { time:tStart, timeEnd:tEnd, type:pickType };
+    if(pickType==="habit" || pickType==="assenza"){ $("conflictWarn").className="conflict-warn"; return; }
+    var conf = hasConflict(draft, day, editId);
+    if(conf){
+      $("conflictWarn").textContent = "Si sovrappone a: "+conf.title+" ("+timeRange(conf)+")";
+      $("conflictWarn").className = "conflict-warn show";
+    } else {
+      $("conflictWarn").className = "conflict-warn";
+    }
+  }
+
+  function createPrepTask(scadenzaItem){
+    if(scadenzaItem.type !== "scadenza") return;
+    var day = Number(scadenzaItem.weekday);
+    if(scadenzaItem.rep && scadenzaItem.rep!=="none"){
+      // for recurring deadline, prep on previous weekday of each occurrence is complex; skip auto for recurring
+      return;
+    }
+    var d = new Date(scadenzaItem.date + "T12:00:00");
+    d.setDate(d.getDate() - 1);
+    var prepDate = iso(d);
+    var already = items.some(function(x){
+      return x.type==="task" && x.note && x.note.indexOf("Prep per: "+scadenzaItem.title)!==-1 && x.date===prepDate;
+    });
+    if(already) return;
+    items.push({
+      id: String(Date.now()+1),
+      title: "Prepara: "+scadenzaItem.title,
+      time: "09:00",
+      timeEnd: "10:00",
+      type: "task",
+      rep: "none",
+      urgente: true,
+      weekday: (day+6)%7,
+      date: prepDate,
+      note: "Prep per: "+scadenzaItem.title,
+      skips: [],
+      doneDates: []
+    });
+  }
+
+  function buildStats(){
+    var reunMin=0, callMin=0, taskMin=0, absDays=0, scadTot=0, scadDone=0, habitTot=0, habitDone=0;
+    for(var i=0;i<7;i++){
+      var rows = ofDay(i);
+      var dateStr = iso(dateFor(i));
+      var dayAbs = false;
+      for(var j=0;j<rows.length;j++){
+        var x = rows[j];
+        var mins = Math.round(durationHours(x)*60);
+        if(x.type==="riunione") reunMin += mins;
+        if(x.type==="call") callMin += mins;
+        if(x.type==="task") taskMin += mins;
+        if(x.type==="assenza") dayAbs = true;
+        if(x.type==="scadenza"){ scadTot++; if(isDone(x,dateStr)) scadDone++; }
+        if(x.type==="habit"){ habitTot++; if(isDone(x,dateStr)) habitDone++; }
+      }
+      if(dayAbs) absDays++;
+    }
+    var html = "<p><b>Riunioni:</b> "+Math.round(reunMin/60*10)/10+" h</p>";
+    html += "<p><b>Call:</b> "+Math.round(callMin/60*10)/10+" h</p>";
+    html += "<p><b>Task / focus:</b> "+Math.round(taskMin/60*10)/10+" h</p>";
+    html += "<p><b>Giorni di assenza:</b> "+absDays+"</p>";
+    html += "<p><b>Scadenze:</b> "+scadDone+"/"+scadTot+" completate</p>";
+    html += "<p><b>Abitudini:</b> "+habitDone+"/"+habitTot+" fatte</p>";
+    var loadAvg = 0;
+    for(var k=0;k<5;k++) loadAvg += dayLoadHours(k);
+    loadAvg = Math.round(loadAvg/5*10)/10;
+    html += "<p><b>Carico medio Lun–Ven:</b> "+loadAvg+" h / "+WORK_HOURS+" h</p>";
+    if(absDays) html += "<p style='color:#c43c3c'>Hai avuto "+absDays+" giorno/i fuori ufficio.</p>";
+    else if(loadAvg >= 7) html += "<p style='color:#e08a16'>Settimana intensa: riposa un po'.</p>";
+    else if(loadAvg < 3) html += "<p style='color:#0f7a4a'>Settimana leggera, bravo.</p>";
+    else html += "<p style='color:var(--navy)'>Carico nella norma.</p>";
+    return html;
+  }
+
   $("prevW").onclick=function(){ weekOff--; render(); };
   $("nextW").onclick=function(){ weekOff++; render(); };
   $("weekLabel").onclick=function(){ weekOff=0; selected=todayIndex(); render(); };
+
+  $("viewWeek").onclick=function(){ viewMode="week"; render(); };
+  $("viewToday").onclick=function(){ viewMode="today"; weekOff=0; selected=todayIndex(); render(); };
+
+  $("filters").onclick=function(e){
+    var b=e.target.closest("[data-filter]"); if(!b) return;
+    typeFilter = b.getAttribute("data-filter");
+    var chips = $("filters").querySelectorAll(".chip");
+    for(var i=0;i<chips.length;i++) chips[i].className="chip"+(chips[i].getAttribute("data-filter")===typeFilter?" on":"");
+    render();
+  };
+  $("searchBox").oninput=function(){ searchQ = this.value.replace(/^\s+|\s+$/g,""); render(); };
+
   $("days").onclick=function(e){
     var b=e.target; while(b && b!==this && !b.getAttribute("data-day")) b=b.parentNode;
     if(!b||!b.getAttribute||b.getAttribute("data-day")==null) return;
     selected=Number(b.getAttribute("data-day")); render();
   };
+
   $("list").onclick=function(e){
     var doneBtn=e.target.closest("[data-done]");
     var editBtn=e.target.closest("[data-edit]");
     var skipBtn=e.target.closest("[data-skip]");
     var delBtn=e.target.closest("[data-del]");
+    var dupBtn=e.target.closest("[data-dup]");
+    var snoozeBtn=e.target.closest("[data-snooze]");
+    var habitCb=e.target.closest("[data-habit]");
     var col = e.target.closest("[data-col]");
-    if(col && !doneBtn && !editBtn && !skipBtn && !delBtn){
+
+    if(habitCb){
+      var item=findItem(habitCb.getAttribute("data-habit"));
+      if(!item) return;
+      var dayIdx = Number(habitCb.getAttribute("data-day"));
+      item.doneDates = toggleDate(item.doneDates, iso(dateFor(dayIdx)));
+      persist(); render(); return;
+    }
+    if(col && !doneBtn && !editBtn && !skipBtn && !delBtn && !dupBtn && !snoozeBtn){
       selected = Number(col.getAttribute("data-col")); render(); return;
     }
     if(doneBtn){
@@ -492,12 +857,82 @@
       if(!item) return;
       var d = doneBtn.getAttribute("data-day");
       var dayIdx = d==null ? selected : Number(d);
-      item.doneDates = toggleDate(item.doneDates, iso(dateFor(dayIdx)));
-      persist(); render(); return;
+      var dateStr = iso(dateFor(dayIdx));
+      if(isDone(item, dateStr)){
+        item.doneDates = toggleDate(item.doneDates, dateStr);
+        setDoneNote(item, dateStr, "");
+        persist(); render(); return;
+      }
+      pendingDone = { item:item, dayIdx:dayIdx };
+      $("doneNote").value = "";
+      $("doneSheet").className = "sheet show";
+      return;
     }
     if(editBtn){
       var item=findItem(editBtn.getAttribute("data-edit"));
       if(item) openForm(item);
+      return;
+    }
+    if(dupBtn){
+      var item=findItem(dupBtn.getAttribute("data-dup"));
+      if(!item) return;
+      var d = dupBtn.getAttribute("data-day");
+      var dayIdx = d==null ? selected : Number(d);
+      var copy = {
+        id: String(Date.now()),
+        title: item.title,
+        time: item.time || "09:00",
+        timeEnd: item.timeEnd || addHour(item.time || "09:00"),
+        type: item.type,
+        rep: "none",
+        urgente: !!item.urgente,
+        weekday: dayIdx,
+        date: iso(dateFor(dayIdx)),
+        note: item.note || "",
+        skips: [],
+        doneDates: []
+      };
+      items.push(copy);
+      selected = dayIdx;
+      persist(); render();
+      return;
+    }
+    if(snoozeBtn){
+      var item=findItem(snoozeBtn.getAttribute("data-snooze"));
+      if(!item) return;
+      var d = snoozeBtn.getAttribute("data-day");
+      var dayIdx = d==null ? selected : Number(d);
+      var dateStr = iso(dateFor(dayIdx));
+      // skip today if recurring, or move one-off by 1 day
+      if(item.rep && item.rep!=="none"){
+        item.skips = item.skips || [];
+        if(item.skips.indexOf(dateStr)===-1) item.skips.push(dateStr);
+        // also create a one-off tomorrow
+        var nextDay = (dayIdx + 1) % 7;
+        var nextDate = dateFor(dayIdx);
+        nextDate.setDate(nextDate.getDate()+1);
+        items.push({
+          id: String(Date.now()),
+          title: item.title,
+          time: item.time,
+          timeEnd: item.timeEnd,
+          type: item.type,
+          rep: "none",
+          urgente: !!item.urgente,
+          weekday: nextDay,
+          date: iso(nextDate),
+          note: (item.note||"") + (item.note?" · ":"") + "Rimandato",
+          skips: [],
+          doneDates: []
+        });
+      } else {
+        var nd = dateFor(dayIdx);
+        nd.setDate(nd.getDate()+1);
+        item.date = iso(nd);
+        item.weekday = (dayIdx+1)%7;
+        item.note = (item.note||"") + (item.note?" · ":"") + "Rimandato";
+      }
+      persist(); render();
       return;
     }
     if(skipBtn){
@@ -516,9 +951,63 @@
       items=items.filter(function(x){ return x.id!==id; }); persist(); render();
     }
   };
-  $("types").onclick=function(e){ var b=e.target.closest("[data-type]"); if(!b) return; pickType=b.getAttribute("data-type"); mark("types","data-type",pickType); };
+
+  $("doneConfirm").onclick=function(){
+    if(!pendingDone) return;
+    var item = pendingDone.item;
+    var dayIdx = pendingDone.dayIdx;
+    var dateStr = iso(dateFor(dayIdx));
+    item.doneDates = toggleDate(item.doneDates, dateStr);
+    var note = $("doneNote").value.replace(/^\s+|\s+$/g,"");
+    setDoneNote(item, dateStr, note);
+    pendingDone = null;
+    $("doneSheet").className = "sheet";
+    persist(); render();
+  };
+  $("doneCancel").onclick=function(){ pendingDone=null; $("doneSheet").className="sheet"; };
+  $("doneSheet").onclick=function(e){ if(e.target.id==="doneSheet"){ pendingDone=null; $("doneSheet").className="sheet"; } };
+
+  $("statsBtn").onclick=function(){
+    $("statsBody").innerHTML = buildStats();
+    $("statsSheet").className = "sheet show";
+  };
+  $("statsClose").onclick=function(){ $("statsSheet").className="sheet"; };
+  $("statsSheet").onclick=function(e){ if(e.target.id==="statsSheet") $("statsSheet").className="sheet"; };
+
+  $("types").onclick=function(e){
+    var b=e.target.closest("[data-type]"); if(!b) return;
+    pickType=b.getAttribute("data-type");
+    mark("types","data-type",pickType);
+    var timeRow = $("timeRow");
+    if(pickType==="habit"){
+      timeRow.style.display = "none";
+      $("fTime").required = false;
+      $("fTimeEnd").required = false;
+    } else {
+      timeRow.style.display = "";
+      $("fTime").required = true;
+      $("fTimeEnd").required = true;
+    }
+    if(pickType==="assenza"){
+      if(!$("fTitle").value) $("fTitle").value = "Assenza";
+      $("fTime").value = WORK_START;
+      $("fTimeEnd").value = WORK_END;
+    }
+    if(pickType==="habit" && !$("fTitle").value) $("fTitle").value = "";
+    checkFormConflict();
+  };
   $("prio").onclick=function(e){ var b=e.target.closest("[data-urg]"); if(!b) return; pickUrg=b.getAttribute("data-urg")==="1"; mark("prio","data-urg", pickUrg?"1":"0"); };
   $("reps").onclick=function(e){ var b=e.target.closest("[data-rep]"); if(!b) return; pickRep=b.getAttribute("data-rep"); mark("reps","data-rep",pickRep); };
+
+  $("fTime").onchange=function(){
+    var s = $("fTime").value || "09:00";
+    var e = $("fTimeEnd").value;
+    if(!e || e <= s) $("fTimeEnd").value = addHour(s);
+    checkFormConflict();
+  };
+  $("fTimeEnd").onchange=checkFormConflict;
+  $("fDay").onchange=checkFormConflict;
+
   function openForm(item){
     fillDays();
     if(item){
@@ -526,7 +1015,8 @@
       $("formTitle").textContent = "Modifica impegno";
       $("saveBtn").textContent = "Aggiorna";
       $("fTitle").value = item.title || "";
-      $("fTime").value = item.time || "09:30";
+      $("fTime").value = item.time || "09:00";
+      $("fTimeEnd").value = item.timeEnd || addHour(item.time || "09:00");
       $("fNote").value = item.note || "";
       pickType = item.type || "riunione";
       pickRep = item.rep || "none";
@@ -542,7 +1032,8 @@
       $("form").reset();
       $("formTitle").textContent = "Nuovo impegno";
       $("saveBtn").textContent = "Salva";
-      $("fTime").value = "09:30";
+      $("fTime").value = "09:00";
+      $("fTimeEnd").value = "10:00";
       $("fDay").value = String(selected);
       pickType = "riunione";
       pickRep = "none";
@@ -551,26 +1042,48 @@
     mark("types","data-type",pickType);
     mark("reps","data-rep",pickRep);
     mark("prio","data-urg", pickUrg?"1":"0");
+    var timeRow = $("timeRow");
+    if(pickType==="habit"){
+      timeRow.style.display = "none";
+      $("fTime").required = false;
+      $("fTimeEnd").required = false;
+    } else {
+      timeRow.style.display = "";
+      $("fTime").required = true;
+      $("fTimeEnd").required = true;
+    }
+    checkFormConflict();
     $("sheet").className = "sheet show";
   }
   $("addBtn").onclick=function(){ openForm(null); };
   $("talkBtn").onclick=speak;
   $("sheet").onclick=function(e){ if(e.target.id==="sheet") $("sheet").className="sheet"; };
+
   $("form").onsubmit=function(e){
     if(e&&e.preventDefault) e.preventDefault();
     var title=$("fTitle").value.replace(/^\s+|\s+$/g,""); if(!title) return false;
     var day=Number($("fDay").value);
-    var payload = { title:title, time:$("fTime").value||"09:30", type:pickType, rep:pickRep, urgente:!!pickUrg, weekday:day, date:iso(dateFor(day)), note:$("fNote").value.replace(/^\s+|\s+$/g,"") };
+    var tStart = $("fTime").value||"09:00";
+    var tEnd = $("fTimeEnd").value||addHour(tStart);
+    if(pickType !== "habit" && tEnd < tStart) tEnd = addHour(tStart);
+    if(pickType === "habit"){ tStart = ""; tEnd = ""; }
+    var payload = {
+      title:title, time:tStart, timeEnd:tEnd, type:pickType, rep:pickRep,
+      urgente:!!pickUrg, weekday:day, date:iso(dateFor(day)),
+      note:$("fNote").value.replace(/^\s+|\s+$/g,"")
+    };
     if(editId){
       var cur=findItem(editId);
       if(cur){
-        cur.title=payload.title; cur.time=payload.time; cur.type=payload.type;
+        cur.title=payload.title; cur.time=payload.time; cur.timeEnd=payload.timeEnd; cur.type=payload.type;
         cur.rep=payload.rep; cur.urgente=payload.urgente; cur.weekday=payload.weekday; cur.date=payload.date; cur.note=payload.note;
         if(!cur.skips) cur.skips=[];
       }
       editId=null;
     } else {
-      payload.id=String(Date.now()); payload.skips=[]; payload.doneDates=[]; items.push(payload);
+      payload.id=String(Date.now()); payload.skips=[]; payload.doneDates=[];
+      items.push(payload);
+      if(payload.type === "scadenza" && payload.rep === "none") createPrepTask(payload);
     }
     selected=day; persist(); $("sheet").className="sheet"; render(); return false;
   };
