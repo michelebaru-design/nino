@@ -83,8 +83,8 @@
     .day.blocked-day:not(.on) { outline:2px solid #e25563; }
     .board { flex:1; overflow:auto; background:#fff; border-radius:20px; padding:12px 10px 16px; }
     .empty { text-align:center; color:var(--muted); padding:36px 12px; font-weight:600; }
-    .row { display:grid; grid-template-columns:58px 14px 1fr; gap:0 8px; min-height:64px; }
-    .hh { font-weight:800; color:var(--navy); font-size:11px; padding-top:2px; line-height:1.25; word-break:break-all; }
+    .row { display:grid; grid-template-columns:46px 12px 1fr; gap:0 6px; min-height:64px; }
+    .hh { font-weight:800; color:var(--navy); font-size:10px; padding-top:2px; line-height:1.35; }
     .rail { position:relative; }
     .rail:before { content:""; position:absolute; left:5px; top:10px; bottom:-8px; width:2px; background:#d7e2f2; }
     .row:last-child .rail:before { display:none; }
@@ -114,7 +114,7 @@
     .t-blocked { background:#ffb3b3; color:#9b1c1c; }
     .card.done .title { text-decoration:line-through; opacity:.75; }
     .card.blocked .title { color:#9b1c1c; }
-    .title { font-weight:750; font-size:15px; padding-right:78px; }
+    .title { font-weight:750; font-size:15px; }
     .meta { color:var(--muted); font-size:12px; margin-top:3px; }
     .tag { display:inline-block; font-size:10px; font-weight:800; padding:2px 6px; border-radius:999px; margin-right:4px; }
     .t-riunione { background:#e7efff; color:#1d4fbf; }
@@ -123,11 +123,12 @@
     .t-task { background:#f1e9ff; color:#6b3cc3; }
     .t-assenza { background:#ffd0d0; color:#9b1c1c; }
     .rep { font-size:10px; font-weight:800; color:var(--blue); }
-    .acts { float:right; display:flex; gap:4px; margin:-2px 0 0; }
-    .del, .skip { height:28px; border-radius:9px; background:#fff; font-size:11px; font-weight:800; padding:0 8px; }
-    .del { color:var(--bad); width:28px; padding:0; font-size:16px; }
+    .acts { display:flex; flex-wrap:wrap; gap:3px; margin:0 0 6px; clear:both; }
+    .del, .skip { height:26px; border-radius:8px; background:#fff; font-size:10px; font-weight:800; padding:0 7px; box-shadow:0 1px 3px rgba(42,78,168,.1); }
+    .del { color:var(--bad); width:26px; padding:0; font-size:14px; }
     .skip { color:var(--navy); }
     .edit { color:var(--navy); }
+    .title { clear:both; }
     .nowbar { grid-column:1 / -1; display:flex; align-items:center; gap:8px; color:#c43c3c; font-size:11px; font-weight:800; margin:2px 0 8px; }
     .nowbar i { flex:1; height:2px; background:#f3c4c4; display:block; }
     .sheet { position:fixed; inset:0; background:rgba(8,16,32,.45); display:none; align-items:flex-end; justify-content:center; z-index:20; }
@@ -417,6 +418,14 @@
     if(x.type === "habit") return "Abit.";
     var s = x.time || "09:00";
     var e = x.timeEnd || addHour(s);
+    if(s === e) return s;
+    // due righe per non spezzare male l'orario
+    return s+"\n"+e;
+  }
+  function timeRangeInline(x){
+    if(x.type === "habit") return "Abit.";
+    var s = x.time || "09:00";
+    var e = x.timeEnd || addHour(s);
     return s === e ? s : s+"–"+e;
   }
   function durationHours(x){
@@ -563,9 +572,9 @@
     if(!items.length) return { main:"Nessun impegno in archivio. Ne mettiamo uno anche tra due settimane?", sub:"Usa le frecce in alto per cambiare settimana." };
     if(hasBlock && blockedN) return { main: when+" sei fuori: i ricorrenti sono in pausa.", sub: blockedN+" impegni ricorrenti risultano bloccati." };
     if(!timed.length) return { main: when+" giornata libera, bravo.", sub: weekN? (weekN+" impegni in questa settimana."):"Questa settimana è libera." };
-    if(timed.length >= 5) return { main: when+" giornata intensa, respira. Hai "+timed.length+" impegni.", sub: timed.map(function(x){ return timeRange(x)+" "+x.title; }).join(", ")+"." };
-    if(timed.length===1) return { main: when+" "+timeRange(timed[0])+": "+timed[0].title+".", sub: (LABELS[timed[0].type]||"")+(timed[0].rep && timed[0].rep!=="none"?" · "+REPS[timed[0].rep]:"") };
-    return { main: when+" hai "+timed.length+" impegni, dal "+timed[0].time+" al "+(timed[timed.length-1].timeEnd||timed[timed.length-1].time)+".", sub: timed.map(function(x){ return timeRange(x)+" "+x.title; }).join(", ")+"." };
+    if(timed.length >= 5) return { main: when+" giornata intensa, respira. Hai "+timed.length+" impegni.", sub: timed.map(function(x){ return timeRangeInline(x)+" "+x.title; }).join(", ")+"." };
+    if(timed.length===1) return { main: when+" "+timeRangeInline(timed[0])+": "+timed[0].title+".", sub: (LABELS[timed[0].type]||"")+(timed[0].rep && timed[0].rep!=="none"?" · "+REPS[timed[0].rep]:"") };
+    return { main: when+" hai "+timed.length+" impegni, dal "+timed[0].time+" al "+(timed[timed.length-1].timeEnd||timed[timed.length-1].time)+".", sub: timed.map(function(x){ return timeRangeInline(x)+" "+x.title; }).join(", ")+"." };
   }
 
   function nearestId(rows){
@@ -636,9 +645,9 @@
     var tone = done ? "done" : (blocked ? "blocked" : (conflict ? "conflict" : (x.type==="assenza" ? "assenza" : (x.type==="habit" ? "habit" : (urg ? "urg" : (recurring ? "rip" : ""))))));
     var isTodayCol = iso(dateFor(dayIdx))===todayIso();
     var focus = isTodayCol ? nearestId(ofDay(dayIdx)) : null;
-    var range = timeRange(x);
+    var range = timeRange(x).replace(/\n/g,"<br>");
     var doneNote = getDoneNote(x, dateStr);
-    return '<div class="row'+(focus===x.id?" now":"")+'"><div class="hh">'+esc(range)+'</div><div class="rail"><div class="dotline '+esc(x.type)+(tone?" "+tone:"")+'"></div></div><div class="card'+(tone?" "+tone:"")+'">'+
+    return '<div class="row'+(focus===x.id?" now":"")+'"><div class="hh">'+range+'</div><div class="rail"><div class="dotline '+esc(x.type)+(tone?" "+tone:"")+'"></div></div><div class="card'+(tone?" "+tone:"")+'">'+
       '<div class="acts">'+
       '<button type="button" class="skip edit" data-day="'+dayIdx+'" data-done="'+esc(x.id)+'">'+(done?"Annulla":"Fatto")+'</button>'+
       '<button type="button" class="skip edit" data-day="'+dayIdx+'" data-edit="'+esc(x.id)+'">Modifica</button>'+
@@ -728,22 +737,23 @@
     var mon = thisMonday();
     // da 4 settimane fa a 8 settimane avanti rispetto a oggi
     for(var w=-4; w<=8; w++){
+      html += '<optgroup label="'+weekLabelForOff(w)+'">';
       for(var i=0;i<7;i++){
         var d = new Date(mon);
         d.setDate(d.getDate() + w*7 + i);
         d.setHours(12,0,0,0);
         var val = iso(d);
-        var lab = DAYS[i]+" "+d.getDate()+"/"+(d.getMonth()+1)+" · "+weekLabelForOff(w);
+        var lab = DAYS[i]+" "+d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear();
         html += '<option value="'+val+'">'+lab+'</option>';
       }
+      html += '</optgroup>';
     }
     $("fDay").innerHTML=html;
     var target = preferIso || iso(dateFor(selected));
     if(!$("fDay").querySelector('option[value="'+target+'"]')){
-      // fallback: aggiungi il giorno preferito se fuori range
       var extra = new Date(target+"T12:00:00");
       var di = extra.getDay(); di = di===0?6:di-1;
-      $("fDay").innerHTML = '<option value="'+target+'">'+DAYS[di]+" "+extra.getDate()+"/"+(extra.getMonth()+1)+'</option>' + html;
+      $("fDay").innerHTML = '<optgroup label="altra data"><option value="'+target+'">'+DAYS[di]+" "+extra.getDate()+"/"+(extra.getMonth()+1)+"/"+extra.getFullYear()+'</option></optgroup>' + html;
     }
     $("fDay").value = target;
   }
@@ -780,7 +790,7 @@
       if(overlaps(draft, x)){ conf = x; break; }
     }
     if(conf){
-      $("conflictWarn").textContent = "Si sovrappone a: "+conf.title+" ("+timeRange(conf)+")";
+      $("conflictWarn").textContent = "Si sovrappone a: "+conf.title+" ("+timeRangeInline(conf)+")";
       $("conflictWarn").className = "conflict-warn show";
     } else {
       $("conflictWarn").className = "conflict-warn";
