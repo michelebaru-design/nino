@@ -83,95 +83,62 @@
     .day.blocked-day:not(.on) { outline:2px solid #e25563; }
     .board { flex:1; overflow:auto; background:#fff; border-radius:20px; padding:12px 10px 16px; }
     .empty { text-align:center; color:var(--muted); padding:36px 12px; font-weight:600; }
-    .row { display:grid; grid-template-columns:52px 14px 1fr; gap:0 8px; min-height:72px; margin-bottom:4px; }
-    .hh {
-      font-weight:800; color:var(--navy); font-size:12px; padding-top:4px; line-height:1.35;
-      letter-spacing:-0.02em;
-    }
-    .rail { position:relative; }
-    .rail:before { content:""; position:absolute; left:6px; top:14px; bottom:-12px; width:2px; background:#d0dbea; }
-    .row:last-child .rail:before { display:none; }
-    .dotline {
-      width:14px; height:14px; border-radius:50%; background:#4a7dff;
-      border:3px solid #d7e6ff; margin-top:4px; position:relative; z-index:1;
-      box-shadow:0 0 0 2px #fff;
-    }
-    .dotline.scadenza { background:#e08a16; border-color:#ffe0bd; }
-    .dotline.call { background:#1f9d6a; border-color:#cfeedf; }
-    .dotline.task { background:#6b3cc3; border-color:#eadbff; }
-    .dotline.assenza { background:#c43c3c; border-color:#ffc9c9; }
-    .dotline.habit { background:#3a9ad9; border-color:#c5e5f8; }
-    .card {
+    /* —— cella orizzontale per ogni impegno —— */
+    .row { margin-bottom:8px; }
+    .row.now .cell { box-shadow:0 0 0 2px var(--blue), 0 4px 14px rgba(74,125,255,.18); }
+    .cell {
+      display:grid;
+      grid-template-columns:58px 1fr auto;
+      gap:0 10px;
+      align-items:center;
       background:#fff;
       border-radius:14px;
-      padding:12px 12px 12px 14px;
-      margin-bottom:10px;
       border:1px solid #e4ebf5;
       border-left:5px solid #4a7dff;
-      box-shadow:0 2px 8px rgba(42,78,168,.06);
+      padding:10px 8px 10px 0;
+      min-height:56px;
+      box-shadow:0 2px 6px rgba(42,78,168,.05);
     }
-    .card.type-riunione { border-left-color:#3a6ad9; background:#f7faff; }
-    .card.type-call { border-left-color:#1f9d6a; background:#f3fbf7; }
-    .card.type-scadenza { border-left-color:#e08a16; background:#fffaf3; }
-    .card.type-task { border-left-color:#6b3cc3; background:#faf7ff; }
-    .card.type-assenza { border-left-color:#c43c3c; background:#fff5f5; }
-    .card.type-habit { border-left-color:#3a9ad9; background:#f3f9fd; }
-    .now .card {
-      outline:2px solid var(--blue);
-      box-shadow:0 4px 14px rgba(74,125,255,.2);
+    .cell.type-riunione { border-left-color:#3a6ad9; background:#f7faff; }
+    .cell.type-call { border-left-color:#1f9d6a; background:#f3fbf7; }
+    .cell.type-scadenza { border-left-color:#e08a16; background:#fffaf3; }
+    .cell.type-task { border-left-color:#6b3cc3; background:#faf7ff; }
+    .cell.type-assenza { border-left-color:#c43c3c; background:#fff5f5; }
+    .cell.type-habit { border-left-color:#3a9ad9; background:#f3f9fd; }
+    .cell.urg { border-left-color:#d64545; background:#fff0f0; }
+    .cell.done { background:#f0faf3 !important; border-left-color:#1f9d6a; opacity:.88; }
+    .cell.blocked { background:#fff0f0 !important; border-left-color:#c43c3c; box-shadow:0 0 0 2px #e25563; }
+    .cell.conflict { background:#fff6eb !important; border-left-color:#e08a16; box-shadow:0 0 0 2px #e08a16; }
+    .cell.assenza { background:#fff5f5; border-left-color:#c43c3c; }
+    .cell-time {
+      font-weight:800; color:var(--navy); font-size:12px; line-height:1.3;
+      text-align:center; padding:0 4px 0 6px; letter-spacing:-0.02em;
     }
-    .card.rip { /* ricorrente: leggero accento */ }
-    .card.urg {
-      border-left-color:#d64545;
-      background:#fff0f0;
-      box-shadow:0 2px 8px rgba(214,69,69,.12);
-    }
-    .card.done {
-      background:#f0faf3 !important;
-      border-color:#c5e8d0;
-      border-left-color:#1f9d6a;
-      opacity:.85;
-    }
-    .card.blocked {
-      background:#fff0f0 !important;
-      border-left-color:#c43c3c;
-      outline:2px solid #e25563;
-    }
-    .card.conflict {
-      background:#fff6eb !important;
-      border-left-color:#e08a16;
-      outline:2px solid #e08a16;
-    }
-    .card.assenza { background:#fff5f5; border-left-color:#c43c3c; }
-    .now .card.rip { outline-color:#e0b12d; }
-    .now .card.urg { outline-color:#d64545; }
-    .now .card.done { outline-color:#1f9d6a; }
-    .now .card.blocked { outline-color:#c43c3c; }
-    .now .card.conflict { outline-color:#e08a16; }
-    .dotline.rip { background:#e0b12d; border-color:#ffe9a0; }
-    .dotline.urg { background:#d64545; border-color:#ffb3b3; }
-    .dotline.done { background:#1f9d6a; border-color:#b5ebc6; }
-    .dotline.blocked { background:#c43c3c; border-color:#ffb3b3; }
-    .dotline.conflict { background:#e08a16; border-color:#ffe0bd; }
-    .t-rip { background:#fff0c2; color:#7a5c00; }
-    .t-urg { background:#ffc9c9; color:#9b1c1c; }
-    .t-done { background:#b5ebc6; color:#0f7a4a; }
-    .t-blocked { background:#ffc9c9; color:#9b1c1c; }
-    .t-conflict { background:#ffe0bd; color:#8a4b00; }
-    .card.done .title { text-decoration:line-through; opacity:.7; }
-    .card.blocked .title { color:#9b1c1c; }
+    .cell-body { min-width:0; }
     .title {
-      font-weight:750; font-size:16px; line-height:1.3; color:var(--ink);
-      margin:0 0 2px; letter-spacing:-0.02em;
+      font-weight:750; font-size:15px; line-height:1.25; color:var(--ink);
+      margin:0; letter-spacing:-0.02em;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
+    .cell.done .title { text-decoration:line-through; opacity:.7; }
+    .cell.blocked .title { color:#9b1c1c; }
     .meta {
-      color:var(--muted); font-size:12px; margin-top:6px;
-      display:flex; flex-wrap:wrap; align-items:center; gap:4px 2px;
-      line-height:1.4;
+      color:var(--muted); font-size:11px; margin-top:3px;
+      display:flex; flex-wrap:wrap; align-items:center; gap:3px;
+      line-height:1.35;
+    }
+    .meta .note-line {
+      display:block; width:100%; margin-top:2px;
+      color:#5a6b85; font-weight:500;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .meta .done-line {
+      display:block; width:100%; margin-top:1px;
+      color:#0f7a4a; font-weight:650;
     }
     .tag {
       display:inline-block; font-size:10px; font-weight:800;
-      padding:3px 8px; border-radius:999px; margin-right:2px;
+      padding:2px 7px; border-radius:999px;
       letter-spacing:.02em;
     }
     .t-riunione { background:#dce8ff; color:#1d4fbf; }
@@ -180,20 +147,26 @@
     .t-task { background:#e8dcff; color:#5a2aad; }
     .t-assenza { background:#ffd0d0; color:#9b1c1c; }
     .t-habit { background:#d6eefc; color:#1a5f9e; }
-    .rep { font-size:10px; font-weight:800; color:var(--blue); }
-    .acts {
-      display:flex; flex-wrap:wrap; gap:4px;
-      margin:0 0 8px; padding-bottom:8px;
-      border-bottom:1px solid #eef2f8;
+    .t-rip { background:#fff0c2; color:#7a5c00; }
+    .t-urg { background:#ffc9c9; color:#9b1c1c; }
+    .t-done { background:#b5ebc6; color:#0f7a4a; }
+    .t-blocked { background:#ffc9c9; color:#9b1c1c; }
+    .t-conflict { background:#ffe0bd; color:#8a4b00; }
+    .cell-acts {
+      display:flex; flex-direction:column; gap:3px;
+      flex-shrink:0;
     }
+    .cell-acts .actrow { display:flex; gap:3px; justify-content:flex-end; }
     .del, .skip {
-      height:28px; border-radius:9px; background:#f4f7fc;
-      font-size:11px; font-weight:800; padding:0 9px;
-      border:1px solid #e4ebf5;
+      height:26px; border-radius:8px; background:#fff;
+      font-size:10px; font-weight:800; padding:0 7px;
+      border:1px solid #e4ebf5; white-space:nowrap;
     }
-    .del { color:var(--bad); width:28px; padding:0; font-size:15px; background:#fff5f5; border-color:#ffd0d0; }
+    .del { color:var(--bad); width:26px; padding:0; font-size:14px; background:#fff5f5; border-color:#ffd0d0; }
     .skip { color:var(--navy); }
     .edit { color:var(--navy); }
+    /* legacy aliases so old class refs don't break */
+    .hh, .rail, .dotline, .card, .acts { }
     .nowbar { grid-column:1 / -1; display:flex; align-items:center; gap:8px; color:#c43c3c; font-size:11px; font-weight:800; margin:2px 0 8px; }
     .nowbar i { flex:1; height:2px; background:#f3c4c4; display:block; }
     .sheet { position:fixed; inset:0; background:rgba(8,16,32,.45); display:none; align-items:flex-end; justify-content:center; z-index:20; }
@@ -284,15 +257,19 @@
       .colhead { display:block; text-align:center; margin-bottom:8px; cursor:pointer; }
       .colhead .dn { font-size:11px; font-weight:800; color:var(--muted); }
       .colhead .dd { font-size:18px; font-weight:800; }
-      .col .row { grid-template-columns:48px 1fr; gap:6px; min-height:auto; }
-      .col .hh { font-size:11px; }
-      .col .rail { display:none; }
-      .col .card { margin-bottom:8px; padding:10px 10px 10px 12px; border-left-width:4px; }
-      .col .title { font-size:14px; padding-right:0; }
-      .col .acts { margin:0 0 6px; padding-bottom:6px; }
-      .col .acts { float:none; display:flex; flex-wrap:wrap; margin:0 0 4px; }
-      .col .acts button { height:24px; font-size:10px; }
-      .col .del { width:24px; }
+      .col .cell {
+        grid-template-columns:1fr;
+        gap:4px;
+        padding:8px 8px 8px 0;
+        border-left-width:4px;
+      }
+      .col .cell-time { text-align:left; padding:0 0 0 8px; font-size:11px; }
+      .col .cell-body { padding:0 8px; }
+      .col .title { font-size:13px; white-space:normal; }
+      .col .cell-acts { flex-direction:row; flex-wrap:wrap; padding:0 6px 2px; }
+      .col .cell-acts .actrow { flex-wrap:wrap; }
+      .col .del, .col .skip { height:22px; font-size:9px; padding:0 5px; }
+      .col .del { width:22px; }
       .pc-hint { display:block; font-size:12px; color:var(--muted); font-weight:600; margin:0 0 6px; }
     }
   </style>
@@ -717,23 +694,35 @@
     var focus = isTodayCol ? nearestId(ofDay(dayIdx)) : null;
     var range = timeRange(x).replace(/\n/g,"<br>");
     var doneNote = getDoneNote(x, dateStr);
-    return '<div class="row'+(focus===x.id?" now":"")+'"><div class="hh">'+range+'</div><div class="rail"><div class="dotline '+esc(x.type)+(tone?" "+tone:"")+'"></div></div><div class="card type-'+esc(x.type)+(tone?" "+tone:"")+'">'+
-      '<div class="acts">'+
-      '<button type="button" class="skip edit" data-day="'+dayIdx+'" data-done="'+esc(x.id)+'">'+(done?"Annulla":"Fatto")+'</button>'+
-      '<button type="button" class="skip edit" data-day="'+dayIdx+'" data-edit="'+esc(x.id)+'">Modifica</button>'+
-      '<button type="button" class="skip" data-day="'+dayIdx+'" data-dup="'+esc(x.id)+'">Copia</button>'+
-      (recurring||x.type!=="habit"?'<button type="button" class="skip" data-day="'+dayIdx+'" data-snooze="'+esc(x.id)+'">Rimanda</button>':'')+
-      (recurring?'<button type="button" class="skip" data-day="'+dayIdx+'" data-skip="'+esc(x.id)+'">Salta</button>':'')+
-      '<button type="button" class="del" data-del="'+esc(x.id)+'">×</button></div>'+
-      '<div class="title">'+esc(x.title)+'</div><div class="meta"><span class="tag t-'+esc(x.type)+'">'+esc(LABELS[x.type]||x.type)+'</span>'+
-      (done?'<span class="tag t-done">Fatto</span>':'')+
-      (blocked?'<span class="tag t-blocked">Bloccato</span>':'')+
-      (conflict?'<span class="tag t-conflict">Conflitto</span>':'')+
-      (urg && !done && !blocked?'<span class="tag t-urg">Urgente</span>':'')+
-      (recurring?'<span class="tag t-rip">'+esc(REPS[x.rep])+'</span>':'')+
-      (x.note?'<span style="display:block;width:100%;margin-top:4px;color:#5a6b85;font-weight:500">'+esc(x.note)+'</span>':'')+
-      (doneNote?'<span style="display:block;width:100%;margin-top:2px;color:#0f7a4a;font-weight:650">✓ '+esc(doneNote)+'</span>':'')+
-      '</div></div></div>';
+    return '<div class="row'+(focus===x.id?" now":"")+'">'+
+      '<div class="cell type-'+esc(x.type)+(tone?" "+tone:"")+'">'+
+        '<div class="cell-time">'+range+'</div>'+
+        '<div class="cell-body">'+
+          '<div class="title">'+esc(x.title)+'</div>'+
+          '<div class="meta">'+
+            '<span class="tag t-'+esc(x.type)+'">'+esc(LABELS[x.type]||x.type)+'</span>'+
+            (done?'<span class="tag t-done">Fatto</span>':'')+
+            (blocked?'<span class="tag t-blocked">Bloccato</span>':'')+
+            (conflict?'<span class="tag t-conflict">Conflitto</span>':'')+
+            (urg && !done && !blocked?'<span class="tag t-urg">Urgente</span>':'')+
+            (recurring?'<span class="tag t-rip">'+esc(REPS[x.rep])+'</span>':'')+
+            (x.note?'<span class="note-line">'+esc(x.note)+'</span>':'')+
+            (doneNote?'<span class="done-line">✓ '+esc(doneNote)+'</span>':'')+
+          '</div>'+
+        '</div>'+
+        '<div class="cell-acts">'+
+          '<div class="actrow">'+
+            '<button type="button" class="skip edit" data-day="'+dayIdx+'" data-done="'+esc(x.id)+'">'+(done?"↩":"✓")+'</button>'+
+            '<button type="button" class="skip edit" data-day="'+dayIdx+'" data-edit="'+esc(x.id)+'">✎</button>'+
+            '<button type="button" class="del" data-del="'+esc(x.id)+'">×</button>'+
+          '</div>'+
+          '<div class="actrow">'+
+            '<button type="button" class="skip" data-day="'+dayIdx+'" data-dup="'+esc(x.id)+'">Copia</button>'+
+            (recurring||x.type!=="habit"?'<button type="button" class="skip" data-day="'+dayIdx+'" data-snooze="'+esc(x.id)+'">→</button>':'')+
+            (recurring?'<button type="button" class="skip" data-day="'+dayIdx+'" data-skip="'+esc(x.id)+'">Salta</button>':'')+
+          '</div>'+
+        '</div>'+
+      '</div></div>';
   }
 
   function habitsHtml(dayIdx){
